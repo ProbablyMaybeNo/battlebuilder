@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Box, ChevronDown, CircleHelp, Copy, Crosshair, FilePlus2, FolderOpen, Grid3X3, Hammer, Layers3, Maximize2, Minus, MousePointer2, Plus, Redo2, Save, Settings2, Undo2, Upload } from 'lucide-react';
 import { newBoard, starterBoard, type BoardDocument, type Piece } from '../document/schema';
 import { catalog } from '../model/catalog';
@@ -33,6 +33,7 @@ export function App() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string | null>(null);
   const [view, setView] = useState<'overhead' | '3d'>('overhead'); const [preset, setPreset] = useState<'top' | 'isometric' | 'perspective' | 'front'>('isometric');
+  useEffect(() => { const key = (event: KeyboardEvent) => { if (event.key === '1') { setView('overhead'); } if (event.key === '2') { setView('3d'); setPreset('isometric'); } if (event.key === '3') { setView('3d'); setPreset('perspective'); } if (event.key === '4') { setView('3d'); setPreset('front'); } }; window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key); }, []);
   const announce = (message: string, tone: Toast['tone'] = 'info') => setToasts((items) => [...items.slice(-2), { id: Date.now(), tone, message }]);
   const toggleDrawer = (id: DrawerId) => setActiveDrawer((current) => current === id ? null : id);
   const groupedCatalog = useMemo(() => catalog.reduce<Record<string, typeof catalog>>((groups, item) => ({ ...groups, [item.group]: [...(groups[item.group] ?? []), item] }), {}), []);

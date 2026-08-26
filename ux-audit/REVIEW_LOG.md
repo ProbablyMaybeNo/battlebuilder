@@ -54,6 +54,11 @@ B03 own the first visible workspace and board review.
 
 ## B03 — overhead surface verification (2026-08-26)
 
+## B04 — 3D planning verification (2026-08-26)
+
+- Lazy Three.js renderer passed browser verification at the desktop target sizes, including 3D view loading, preset changes, overhead return, picking scaffold, and WebGL context-loss fallback event handling.
+- Full suite passed: lint, strict typecheck, 18 unit tests, 7 isolated Playwright/axe tests, production audit, and build. Initial route is 228.0 KiB; the separately lazy 3D chunk is 501.7 KiB, within its 700 KiB budget.
+
 - SVG grid/camera unit tests passed for 36-inch line counts, 12-inch major
   references, and clamped pan/zoom behavior; the full unit suite now has 18
   passing tests.
