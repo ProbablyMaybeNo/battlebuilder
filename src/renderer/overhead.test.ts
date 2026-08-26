@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { clampCamera, defaultCamera, gridLines, panCamera, zoomCamera } from './overhead';
+describe('overhead camera and grid', () => { it('makes one-inch lines with 12-inch major references', () => { const lines = gridLines(36); expect(lines).toHaveLength(37); expect(lines.filter((line) => line.major).map((line) => line.value)).toEqual([12, 24, 36]); }); it('clamps pan and zoom', () => { expect(clampCamera({ x: 99, y: -99, zoom: 9 })).toEqual({ x: 36, y: -36, zoom: 4 }); expect(zoomCamera(defaultCamera(), .1).zoom).toBe(.5); expect(panCamera(defaultCamera(), 999, 999)).toEqual({ x: -36, y: -36, zoom: 1 }); }); });

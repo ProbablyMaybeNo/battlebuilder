@@ -10,6 +10,8 @@ _No active defects recorded._
 
 ## Completed
 
+- **B03-001 — The shell had a decorative board placeholder rather than a precision editing surface.** Replaced it with a renderer-neutral SVG viewport: fixed one-inch lines, 12-inch major references, board frame, origin/ruler labels, coordinate readout, surface variants, and clamped mouse/keyboard camera controls.
+
 - **B00-001 — Invalid icon dependency prevented reproducible installation.**
   Replaced the nonexistent `@lucide/react` package with `lucide-react`, then
   generated and verified `pnpm-lock.yaml` with `pnpm install`.

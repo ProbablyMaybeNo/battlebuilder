@@ -23,7 +23,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | B00 | Project baseline and repository | — | Complete |
 | B01 | Board document, migrations, and persistence | B00 | Complete |
 | B02 | Design system and workspace shell | B00 | Complete |
-| B03 | Overhead editor, 1-inch board grid, and camera | B01, B02 | Not started |
+| B03 | Overhead editor, 1-inch board grid, and camera | B01, B02 | Complete |
 | B04 | 3D planning renderer and camera | B01, B02, B03 | Not started |
 | B05 | Tactical terrain catalog and shared geometry | B01, B03, B04 | Not started |
 | B06 | Build, transform, structure, access, and join tools | B03, B04, B05 | Not started |

@@ -51,3 +51,14 @@ B03 own the first visible workspace and board review.
   unavailable in this environment. The project’s existing isolated Playwright
   runner was used as the safe fallback for browser, console, axe, and viewport
   verification; this is not a product blocker.
+
+## B03 — overhead surface verification (2026-08-26)
+
+- SVG grid/camera unit tests passed for 36-inch line counts, 12-inch major
+  references, and clamped pan/zoom behavior; the full unit suite now has 18
+  passing tests.
+- Browser checks passed at 1440×960 and 1920×1080 with the overhead SVG in the
+  workspace. Mouse wheel/middle or Shift drag, arrows, +/- and F control the
+  camera; no 3D code was introduced.
+- `lint`, `typecheck`, build, bundle:check (225.8 KiB / 350 KiB), audit, and
+  isolated Playwright/axe checks all passed.
