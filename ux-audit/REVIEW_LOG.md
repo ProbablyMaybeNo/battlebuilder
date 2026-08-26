@@ -34,3 +34,20 @@ manual interaction evidence.
 
 No visual review was required for the renderer-neutral document batch. B02 and
 B03 own the first visible workspace and board review.
+
+## B02 — workspace shell verification (2026-08-26)
+
+- Visual review passed at 1440×960 and 1920×1080. The board surface remains
+  dominant, drawers overlay without leaving permanent blank columns, and the
+  compact rail/top bar retain the intended restrained cyan/navy command style.
+  The actual SVG one-inch grid is explicitly deferred to B03.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit`, and
+  `pnpm bundle:check` all passed. The initial route is 223.1 KiB of the
+  350 KiB budget.
+- `pnpm test:e2e` passed all 6 Chromium checks: isolated storage, both desktop
+  target sizes, drawer/menu/dialog keyboard behavior, focus restoration, and
+  axe scans of the shell and Build drawer with no serious or critical issues.
+- The `agent-browser` CLI required by the local browser-verification skill was
+  unavailable in this environment. The project’s existing isolated Playwright
+  runner was used as the safe fallback for browser, console, axe, and viewport
+  verification; this is not a product blocker.

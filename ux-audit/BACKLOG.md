@@ -31,3 +31,12 @@ _No active defects recorded._
   non-destructive corrupt-draft fallback, and a separate namespaced saved-board
   index supporting create/open/duplicate/rename. Verified with unit and
   isolated-browser tests.
+- **B02-001 — The bootstrap view did not provide a board-dominant workspace or
+  accessible panel framework.** Replaced it with scoped Cyberpunk-derived
+  workspace tokens, document bar, on-demand activity drawers, control shelf,
+  zero state, selection-only inspector container, reusable controls, and
+  reduced-motion behavior. Verified at both desktop target sizes.
+- **B02-002 — Initial shell accessibility review found tooltip contrast and
+  nested Escape/focus-restoration defects.** Tooltips now avoid transitional
+  low-contrast states, while capture-phase dialog handling preserves the drawer
+  opener's focus. Verified with passing axe, keyboard, and focus E2E coverage.
