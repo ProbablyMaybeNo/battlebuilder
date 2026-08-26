@@ -1,0 +1,15 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+coverage/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+
+# User-owned reference material. It informs the visual direction but is never
+# bundled, scanned, or shipped as product source.
+/Design Cyberpunk 3D Planner/
+/Battle Builder Inspo/
+/Start Prompt.txt
