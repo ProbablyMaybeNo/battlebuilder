@@ -10,6 +10,8 @@ _No active defects recorded._
 
 ## Completed
 
+- **B04-001 — The planner had no true 3D board view.** Added a lazy Three.js renderer sharing the B01 board, 1-inch grid scale, surface state, terrain meshes, camera presets, pointer controls, picking scaffold, resize cleanup, and separate lazy chunk budget.
+
 - **B03-001 — The shell had a decorative board placeholder rather than a precision editing surface.** Replaced it with a renderer-neutral SVG viewport: fixed one-inch lines, 12-inch major references, board frame, origin/ruler labels, coordinate readout, surface variants, and clamped mouse/keyboard camera controls.
 
 - **B00-001 — Invalid icon dependency prevented reproducible installation.**
