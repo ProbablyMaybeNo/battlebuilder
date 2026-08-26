@@ -21,7 +21,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | ID | Batch | Depends on | Status |
 | --- | --- | --- | --- |
 | B00 | Project baseline and repository | — | Complete |
-| B01 | Board document, migrations, and persistence | B00 | Not started |
+| B01 | Board document, migrations, and persistence | B00 | Complete |
 | B02 | Design system and workspace shell | B00 | Not started |
 | B03 | Overhead editor, 1-inch board grid, and camera | B01, B02 | Not started |
 | B04 | 3D planning renderer and camera | B01, B02, B03 | Not started |

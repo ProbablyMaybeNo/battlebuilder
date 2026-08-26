@@ -21,3 +21,13 @@ _No active defects recorded._
 - **B00-003 — Browser tests could target a user's normal local draft.** Added
   an isolated Playwright fixture that rewrites the draft namespace to
   `battle-builder/e2e/v1/`, with a passing Chromium verification spec.
+- **B01-001 — Baseline board data could accept configurable grids, board sizes
+  beyond 72 inches, and unvalidated nested terrain data.** Replaced it with a
+  renderer-neutral v1 contract, strict runtime parser, explicit no-op migration
+  registry, fixed one-inch grid rule, 12–72 inch limits, structure footprints,
+  exterior door/window checks, and focused unit coverage.
+- **B01-002 — Draft and saved-board storage had no recovery or isolation-safe
+  library contract.** Added debounced draft persistence with explicit state,
+  non-destructive corrupt-draft fallback, and a separate namespaced saved-board
+  index supporting create/open/duplicate/rename. Verified with unit and
+  isolated-browser tests.

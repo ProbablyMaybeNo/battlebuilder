@@ -217,14 +217,14 @@ Manual sign-off covers mouse, keyboard, pointer cancellation, direct resize/rota
 - [x] Create a separate Battle Builder project surface; do not use C: or previous Wargame Wizard folders.
 - [x] Inspect only supplied reference materials and write the initial architecture plan.
 - [x] Set Node, TypeScript, Vite, lint, test, E2E, audit, and bundle scripts.
-- [ ] Initialize the repository, point `origin` to `https://github.com/ProbablyMaybeNo/battlebuilder.git`, verify access, make an initial commit, and push when GitHub authentication is available.
-- [ ] Commit pinned lockfile, README, contributor workflow, and license decision.
+- [x] Initialize the repository, point `origin` to `https://github.com/ProbablyMaybeNo/battlebuilder.git`, verify access, make an initial commit, and push when GitHub authentication is available.
+- [x] Commit pinned lockfile, README, contributor workflow, and license decision.
 
 ### Phase 1A — Foundation and document safety
 
 - [x] Define v1 document schema, catalog, local draft namespace, import parser, and history base.
-- [ ] Add migration registry, field-level number validation state, local save/open board library, and durable recovery UI.
-- [ ] Add schema/history unit tests and test-storage safeguards.
+- [x] Add migration registry, local save/open board library, and durable persistence recovery contract. Field-level numeric draft-state UI is deferred to B07, where number inputs are built.
+- [x] Add schema, migration, persistence, constraint, and test-storage safeguards. History-base tests remain with lifecycle completion in B08.
 
 ### Phase 1B — Board-first workspace and visual system
 
