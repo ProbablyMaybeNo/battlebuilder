@@ -10,6 +10,16 @@ _No active defects recorded._
 
 ## Completed
 
+- **B10-001 — Phase 1 evidence was split across batch-specific captures and
+  could not show the complete target-size review set in one location.** Added
+  an isolated visual-evidence suite that produces all twenty required
+  screenshots under `ux-audit/screenshots/`, together with a reviewed evidence
+  matrix and manual interaction checklist.
+- **B10-002 — Axe coverage was distributed across prior focused tests rather
+  than explicitly proving every required state.** Added a single isolated axe
+  sweep for zero state, every drawer, every inspector tab, and import recovery;
+  it reports no serious or critical violation.
+
 - **B09-001 — Terrain and 3D planning controls were not fully discoverable or
   operable without a pointer.** Added named, focusable SVG pieces with authored
   focus treatment; a semantic 3D terrain list; keyboard camera/build/access

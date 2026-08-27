@@ -30,7 +30,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | B07 | Drawers, layers, inspector, and board settings | B01, B02, B05, B06 | Complete |
 | B08 | Board lifecycle, history, import/export, and recovery | B01, B06, B07 | Complete |
 | B09 | Accessibility and resilient input completion | B02–B08 | Complete |
-| B10 | Automated tests, visual regression, and audit assets | B01–B09 | Not started |
+| B10 | Automated tests, visual regression, and audit assets | B01–B09 | Complete |
 | B11 | Performance, release hygiene, and GitHub delivery | B10 | Not started |
 | B12 | Manual sign-off and Phase 2 readiness gate | B11 | Not started |
 

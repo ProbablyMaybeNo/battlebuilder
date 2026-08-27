@@ -2,8 +2,9 @@
 
 ## Status
 
-Visual and manual interaction review begins after B10. Required evidence is
-defined in [JOB_BATCHES.md](JOB_BATCHES.md).
+Visual and manual interaction evidence is complete through B10. Required
+evidence and results are recorded in [VISUAL_REVIEW.md](VISUAL_REVIEW.md) and
+[MANUAL_INTERACTION_CHECKLIST.md](MANUAL_INTERACTION_CHECKLIST.md).
 
 ## B00 — project baseline verification (2026-08-26)
 
@@ -156,5 +157,24 @@ B03 own the first visible workspace and board review.
   view clips the board grid.
 - Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (28
   unit tests), `pnpm test:e2e` (30 isolated Chromium checks), `pnpm build`,
+  `pnpm audit`, and `pnpm bundle:check` (277.6 KiB initial / 350 KiB;
+  514.7 KiB lazy 3D / 700 KiB).
+
+## B10 — evidence, regression, and audit verification (2026-08-26)
+
+- Added a consolidated isolated Playwright evidence suite that captures every
+  required review state at 1440×960 and 1920×1080. The complete set of twenty
+  stable-name assets is under `ux-audit/screenshots/`; the assessment is in
+  `VISUAL_REVIEW.md` and the replayed manual checklist is in
+  `MANUAL_INTERACTION_CHECKLIST.md`.
+- The visual review passes: empty state, overhead, isometric and perspective
+  3D, Build/Setup/Layers, selected inspector, invalid collision feedback, and
+  import recovery have no clipping or known defect at either target size.
+- Axe now explicitly sweeps the zero state, four drawers, all five relevant
+  inspector tabs, and import-error dialog. It reports no serious or critical
+  violations. The storage-isolation fixture continues to rewrite all draft
+  keys away from `battle-builder/v1/`.
+- Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (28
+  unit tests), `pnpm test:e2e` (33 isolated Chromium checks), `pnpm build`,
   `pnpm audit`, and `pnpm bundle:check` (277.6 KiB initial / 350 KiB;
   514.7 KiB lazy 3D / 700 KiB).
