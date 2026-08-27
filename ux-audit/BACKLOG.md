@@ -10,6 +10,18 @@ _No active defects recorded._
 
 ## Completed
 
+- **B07-001 — The Build, Layers, and Setup drawers were placeholder shells,
+  leaving planner controls undiscoverable.** Added a searchable grouped catalog
+  with favorites, recents, collapsed categories, and immediate placement;
+  layer search/select/multi lock-hide/reorder actions; and complete bounded
+  dimensions, orientation, surface, and snap configuration. Verified with
+  focused browser flows, axe scans, and target-size drawer captures.
+- **B07-002 — The selection inspector did not expose editable type-aware
+  properties or durable notes.** Replaced it with accessible Properties,
+  Appearance, Structure, Access, and Notes tabs, including safe numeric drafts,
+  terrain name/layer edits, roof/elevation controls, and notes. Verified in
+  Chromium and inspector axe coverage.
+
 - **B06-001 — The tactical board had rendered terrain but no safe construction
   workflow.** Added immutable construction commands with collision/bounds
   validation; Select, Build, neutral, and Access modes; snapped drag previews;

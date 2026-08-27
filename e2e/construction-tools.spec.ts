@@ -17,7 +17,7 @@ test('constructs, selects, transforms, duplicates, and safely cancels board inte
   await expect(page.getByRole('complementary', { name: /inspector$/ })).toHaveCount(0);
 
   await page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' }).click();
-  await page.getByRole('button', { name: /Field building/ }).click();
+  await page.getByRole('button', { name: /Field building/ }).first().click();
   const box = await board.boundingBox();
   if (!box) throw new Error('Board did not have a box');
   await page.mouse.move(box.x + box.width * .08, box.y + box.height * .38);

@@ -104,3 +104,19 @@ B03 own the first visible workspace and board review.
   `pnpm bundle:check` passed. Initial route is 259.0 KiB / 350 KiB; lazy 3D is
   513.1 KiB / 700 KiB. Playwright is used for browser review because the local
   `agent-browser` CLI is unavailable.
+
+## B07 — functional workspace panels verification (2026-08-26)
+
+- Visual review passed at 1440×960 and 1920×1080 for the compact Build,
+  Layers, and Setup drawers. The Build catalog retains favorites/recent tools
+  while collapsed groups prevent a dense, permanent sidebar. Captures:
+  `b07-build-*`, `b07-layers-*`, and `b07-setup-*` at both desktop sizes.
+- Focused browser coverage passed for catalog search and immediate arming,
+  layer finding/selection/locking/visibility/order changes, safe board resize
+  rejection when terrain would clip, surface/orientation/snap settings, and
+  Appearance/Notes inspector controls. Axe reports no serious or critical
+  violations for Build, Layers, Setup, or the inspector.
+- Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (26
+  unit tests), `pnpm build`, `pnpm audit`, `pnpm bundle:check`, and `pnpm
+  test:e2e` (20 isolated Chromium checks). Initial route is 266.7 KiB / 350
+  KiB; lazy 3D remains 513.1 KiB / 700 KiB.
