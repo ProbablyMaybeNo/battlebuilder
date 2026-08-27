@@ -7,7 +7,7 @@ import { normalizeRotation, resizePiece } from '../model/board-operations';
 import { Button, NumberField, Tabs } from './components';
 
 export function BoardPanel({ board, onHelp }: { board: BoardDocument; onHelp: () => void }) {
-  return <><section className="drawer-section"><h3>{board.name}</h3><p>{board.pieces.length} pieces · {board.settings.widthInches} × {board.settings.heightInches} inches · local draft pending lifecycle controls.</p></section><section className="drawer-section"><h3>Board help</h3><p>Build opens a catalog, Layers finds and manages placed terrain, and Setup owns board-scale settings.</p><Button variant="quiet" onClick={onHelp}>Open controls reference</Button></section></>;
+  return <><section className="drawer-section"><h3>{board.name}</h3><p>{board.pieces.length} pieces · {board.settings.widthInches} × {board.settings.heightInches} inches · lifecycle actions are in the Board menu.</p></section><section className="drawer-section"><h3>Board help</h3><p>Build opens a catalog, Layers finds and manages placed terrain, and Setup owns board-scale settings.</p><Button variant="quiet" onClick={onHelp}>Open controls reference</Button></section></>;
 }
 
 export function BuildPanel({ activeKind, onChoose }: { activeKind: PieceKind; onChoose: (kind: PieceKind) => void }) {

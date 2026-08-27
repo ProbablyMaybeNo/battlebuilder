@@ -120,3 +120,21 @@ B03 own the first visible workspace and board review.
   unit tests), `pnpm build`, `pnpm audit`, `pnpm bundle:check`, and `pnpm
   test:e2e` (20 isolated Chromium checks). Initial route is 266.7 KiB / 350
   KiB; lazy 3D remains 513.1 KiB / 700 KiB.
+
+## B08 — lifecycle, history, import/export, and recovery verification (2026-08-26)
+
+- Visual import-recovery review passed at 1440×960 and 1920×1080. The dialog
+  preserves the visible board, identifies the parsing problem, gives a clear
+  corrective path, and keeps a single recovery action. Captures:
+  `b08-import-recovery-1440x960.png` and
+  `b08-import-recovery-1920x1080.png`.
+- Lifecycle browser flows passed for menu-only New/Rename/Save/Open/Duplicate,
+  downloadable JSON export, valid and malformed imports, undo after import,
+  and confirmed Clear/multi-delete followed by Undo. Storage remains isolated
+  through the Playwright fixture.
+- Unit coverage now includes bounded history snapshots, redo branching, schema
+  import validation, saved-library constraints, and corrupt draft fallback.
+  Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (28
+  unit tests), `pnpm build`, `pnpm audit`, `pnpm bundle:check`, and `pnpm
+  test:e2e` (25 isolated Chromium checks). Initial route is 275.1 KiB / 350
+  KiB; lazy 3D is 513.1 KiB / 700 KiB.

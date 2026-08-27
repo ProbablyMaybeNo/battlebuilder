@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import { Box, ChevronDown, CircleHelp, Copy, Crosshair, FilePlus2, FolderOpen, Grid3X3, Hammer, Layers3, Maximize2, Minus, MousePointer2, Plus, Redo2, Save, Settings2, Undo2, Upload } from 'lucide-react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Box, ChevronDown, CircleHelp, Copy, Crosshair, FilePlus2, FolderOpen, Grid3X3, Hammer, Layers3, Maximize2, Minus, MousePointer2, Pencil, Plus, Redo2, Save, Settings2, Trash2, Undo2, Upload } from 'lucide-react';
 import { createHistory, commit, redo, undo, type History } from '../document/history';
-import { newBoard, parseBoard, starterBoard, type BoardDocument, type Piece, type PieceKind, type WallSide } from '../document/schema';
+import { newBoard, parseBoard, starterBoard, validateImport, type BoardDocument, type Piece, type PieceKind, type WallSide } from '../document/schema';
+import { createDraftPersistence, listSavedBoards, openSavedBoard, restoreDraft, saveBoard, type SaveState, type SavedBoardSummary } from '../document/persistence';
 import { catalogByKind } from '../model/catalog';
 import { addAccess, createPiece, joinStructures, movePieces, normalizeRotation, placementResult, removeAccess, resizePiece } from '../model/board-operations';
 import { OverheadBoard, type BoardMode } from '../renderer/overhead';
@@ -12,6 +13,7 @@ import { Button, Dialog, Drawer, IconButton, Menu, MenuItem, Popover, ToastRegio
 const ThreeBoard = lazy(async () => ({ default: (await import('../renderer/three-board')).ThreeBoard }));
 type DrawerId = 'board' | 'build' | 'layers' | 'setup';
 type AccessType = 'door' | 'window';
+type ConfirmAction = 'clear' | 'delete' | null;
 const drawerMeta = [
   { id: 'board' as const, label: 'Board', icon: Box }, { id: 'build' as const, label: 'Build', icon: Hammer },
   { id: 'layers' as const, label: 'Layers', icon: Layers3 }, { id: 'setup' as const, label: 'Setup', icon: Settings2 },
@@ -31,12 +33,32 @@ export function App() {
   const [controlsOpen, setControlsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [hydrated, setHydrated] = useState(false);
+  const [savedBoards, setSavedBoards] = useState<SavedBoardSummary[]>([]);
+  const [openBoardsOpen, setOpenBoardsOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameDraft, setRenameDraft] = useState('');
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const importInput = useRef<HTMLInputElement>(null);
+  const skipInitialDraftWrite = useRef(false);
   const announce = (message: string, tone: Toast['tone'] = 'info') => setToasts((items) => [...items.slice(-2), { id: Date.now(), tone, message }]);
+  const draftPersistence = useMemo(() => createDraftPersistence(window.localStorage, { onStateChange: setSaveState }), []);
   const mutate = (next: BoardDocument) => setHistory((current) => commit(current, parseBoard(next)));
   const command = (next: BoardDocument, message: string, selection = selectedIds) => { mutate(next); setSelectedIds(selection); announce(message, 'success'); };
   const selectedPiece = selectedIds.length ? board.pieces.find((piece) => piece.id === selectedIds.at(-1)) ?? null : null;
   const toggleDrawer = (id: DrawerId) => setActiveDrawer((current) => current === id ? null : id);
   const select = (ids: string[]) => { setSelectedIds(ids); setMode(ids.length ? 'select' : 'neutral'); };
+
+  useEffect(() => {
+    const restored = restoreDraft(window.localStorage, newBoard());
+    if (restored.status === 'restored' && restored.document) setHistory(createHistory(restored.document));
+    if (restored.status === 'corrupt' || restored.status === 'unavailable') { skipInitialDraftWrite.current = true; announce(restored.message, 'warning'); }
+    setHydrated(true);
+    return () => { draftPersistence.flush(); };
+  }, []);
+  useEffect(() => { if (!hydrated) return; if (skipInitialDraftWrite.current) { skipInitialDraftWrite.current = false; return; } draftPersistence.schedule(board); }, [board, hydrated]);
 
   const addBuild = (kind: PieceKind, x: number, y: number, width: number, height: number) => {
     const piece = createPiece(board, kind, x, y, width, height); const result = placementResult(board, piece);
@@ -90,12 +112,55 @@ export function App() {
     command({ ...board, settings }, `Board settings updated to ${settings.widthInches} × ${settings.heightInches} inches.`);
   };
   const chooseCatalog = (kind: PieceKind) => { setSelectedCatalog(kind); setMode('build'); setActiveDrawer(null); announce(`${catalogByKind(kind).name} armed. Drag on the board to set its inch footprint.`); };
+  const refreshSavedBoards = () => {
+    const result = listSavedBoards(window.localStorage);
+    if (result.ok) setSavedBoards(result.value); else announce(result.message, 'warning');
+  };
+  const saveCurrent = () => {
+    const result = saveBoard(window.localStorage, board);
+    if (!result.ok) { announce(result.message, 'warning'); return; }
+    setHistory((current) => ({ ...current, present: result.value }));
+    draftPersistence.schedule(result.value); refreshSavedBoards(); announce('Board saved to this browser.', 'success');
+  };
+  const openLibrary = () => { refreshSavedBoards(); setOpenBoardsOpen(true); };
+  const openBoard = (id: string) => {
+    const result = openSavedBoard(window.localStorage, id);
+    if (!result.ok) { announce(result.message, 'warning'); return; }
+    command(result.value, `Opened ${result.value.name}.`, []); setOpenBoardsOpen(false); setMode('neutral');
+  };
+  const duplicateBoard = () => {
+    const now = new Date().toISOString();
+    const duplicate = parseBoard({ ...board, id: crypto.randomUUID(), name: `Copy of ${board.name}`, createdAt: now, updatedAt: now });
+    command(duplicate, `${duplicate.name} created.`, []); setMode('neutral');
+  };
+  const renameBoard = () => {
+    const name = renameDraft.trim();
+    if (!name) { announce('Board name cannot be blank.', 'warning'); return; }
+    command({ ...board, name }, `Renamed board to ${name}.`); setRenameOpen(false);
+  };
+  const exportBoard = () => {
+    const blob = new Blob([JSON.stringify(parseBoard(board), null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${board.name.replaceAll(/[^a-z0-9]+/gi, '-').replaceAll(/(^-|-$)/g, '') || 'battle-board'}.json`; document.body.append(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 0); announce('Board JSON exported.', 'success');
+  };
+  const importBoard = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]; event.target.value = ''; if (!file) return;
+    try {
+      const result = validateImport(await file.text());
+      if (!result.ok) { setImportError(result.message); return; }
+      command(result.document, `Imported ${result.document.name}.`, []); setMode('neutral');
+    } catch (error) { setImportError(error instanceof Error ? error.message : 'The selected file could not be read.'); }
+  };
+  const resolveConfirm = () => {
+    if (confirmAction === 'clear') command({ ...board, pieces: [] }, 'Board cleared. Undo is available.', []);
+    if (confirmAction === 'delete') removeSelected();
+    setConfirmAction(null);
+  };
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
       const primary = event.ctrlKey || event.metaKey;
-      if (primary && event.key.toLocaleLowerCase() === 'z') { event.preventDefault(); setHistory((value) => event.shiftKey ? redo(value) : undo(value)); }
-      if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIds.length) { event.preventDefault(); removeSelected(); }
+      if (primary && event.key.toLocaleLowerCase() === 'z') { event.preventDefault(); setHistory((value) => event.shiftKey ? redo(value) : undo(value)); setSelectedIds([]); setMode('neutral'); }
+      if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIds.length) { event.preventDefault(); if (selectedIds.length > 1) setConfirmAction('delete'); else removeSelected(); }
       if (primary && event.key.toLocaleLowerCase() === 'd') { event.preventDefault(); duplicate(); }
       if (event.key.toLocaleLowerCase() === 'v') setMode('select');
       if (event.key.toLocaleLowerCase() === 'b') setMode('build');
@@ -112,9 +177,9 @@ export function App() {
     <header className="document-bar">
       <div className="brand"><span className="brand__mark" aria-hidden="true"><Crosshair size={17} /></span><span>Battle Builder</span><span className="brand__phase">Board planner</span></div>
       <label className="board-name"><span className="sr-only">Board name</span><input value={board.name} onChange={(event) => mutate({ ...board, name: event.target.value })} /></label>
-      <span className="save-state"><Save size={14} />Draft changes tracked</span>
+      <span className={`save-state save-state--${saveState}`}><Save size={14} />{saveState === 'pending' ? 'Saving draft…' : saveState === 'saved' ? 'Draft saved' : saveState === 'error' ? 'Draft save error' : 'Draft ready'}</span>
       <div className="document-actions" aria-label="Document history"><IconButton label="Undo" tooltip="Undo (Ctrl+Z)" disabled={!history.past.length} onClick={() => setHistory(undo)}><Undo2 size={16} /></IconButton><IconButton label="Redo" tooltip="Redo (Ctrl+Shift+Z)" disabled={!history.future.length} onClick={() => setHistory(redo)}><Redo2 size={16} /></IconButton></div>
-      <Menu label="Board menu" trigger={<><span>Board</span><ChevronDown size={14} /></>}>{(close) => <><MenuItem onSelect={() => { close(); command(newBoard(), 'New board created.', []); }}><FilePlus2 size={15} />New board</MenuItem><MenuItem onSelect={() => { close(); announce('Saved-board lifecycle arrives in B08.'); }}><FolderOpen size={15} />Open…</MenuItem><MenuItem onSelect={() => { close(); duplicate(); }}><Copy size={15} />Duplicate</MenuItem><MenuItem onSelect={() => { close(); announce('Import is introduced in B08.'); }}><Upload size={15} />Import JSON…</MenuItem><MenuItem onSelect={() => { close(); toggleDrawer('setup'); }}><Settings2 size={15} />Board settings</MenuItem><MenuItem onSelect={() => { close(); setHelpOpen(true); }}><CircleHelp size={15} />Help & controls</MenuItem></>}</Menu>
+      <Menu label="Board menu" trigger={<><span>Board</span><ChevronDown size={14} /></>}>{(close) => <><MenuItem onSelect={() => { close(); command(newBoard(), 'New board created.', []); setMode('neutral'); }}><FilePlus2 size={15} />New board</MenuItem><MenuItem onSelect={() => { close(); setRenameDraft(board.name); setRenameOpen(true); }}><Pencil size={15} />Rename</MenuItem><MenuItem onSelect={() => { close(); saveCurrent(); }}><Save size={15} />Save</MenuItem><MenuItem onSelect={() => { close(); openLibrary(); }}><FolderOpen size={15} />Open…</MenuItem><MenuItem onSelect={() => { close(); duplicateBoard(); }}><Copy size={15} />Duplicate board</MenuItem><MenuItem onSelect={() => { close(); exportBoard(); }}><Save size={15} />Export JSON</MenuItem><MenuItem onSelect={() => { close(); importInput.current?.click(); }}><Upload size={15} />Import JSON…</MenuItem><MenuItem onSelect={() => { close(); setConfirmAction('clear'); }} disabled={!board.pieces.length}><Trash2 size={15} />Clear board</MenuItem><MenuItem onSelect={() => { close(); toggleDrawer('setup'); }}><Settings2 size={15} />Board settings</MenuItem><MenuItem onSelect={() => { close(); setHelpOpen(true); }}><CircleHelp size={15} />Help & controls</MenuItem></>}</Menu>
     </header>
     <div className="workspace-layout">
       <nav className="activity-rail" aria-label="Workspace sections">{drawerMeta.map(({ id, label, icon: Icon }) => <IconButton key={id} label={label} tooltip={label} className={activeDrawer === id ? 'is-active' : undefined} aria-pressed={activeDrawer === id} onClick={() => toggleDrawer(id)}><Icon size={19} /></IconButton>)}</nav>
@@ -135,6 +200,11 @@ export function App() {
         <InspectorPanel piece={selectedPiece} selectionCount={selectedIds.length} accessType={accessType} onAccessType={(type) => { setAccessType(type); setMode('access'); }} onPatch={patchPiece} onDelete={removeSelected} onDuplicate={duplicate} onJoin={join} joinReason={joinReason} onRemoveAccess={removeFeature} />
       </main>
     </div>
+    <input ref={importInput} className="sr-only" type="file" accept="application/json,.json" aria-label="Import board JSON" onChange={importBoard} />
+    <Dialog open={openBoardsOpen} title="Open saved board" onClose={() => setOpenBoardsOpen(false)} actions={<Button variant="quiet" onClick={() => setOpenBoardsOpen(false)}>Cancel</Button>}><p>Saved boards are stored only in this browser. Opening one keeps the current board available through Undo.</p><div className="saved-board-list">{savedBoards.length ? savedBoards.map((saved) => <Button key={saved.id} variant="quiet" onClick={() => openBoard(saved.id)}><span>{saved.name}</span><small>{new Date(saved.updatedAt).toLocaleString()}</small></Button>) : <p>No saved boards yet. Use Board → Save to add this board.</p>}</div></Dialog>
+    <Dialog open={renameOpen} title="Rename board" onClose={() => setRenameOpen(false)} actions={<><Button variant="quiet" onClick={() => setRenameOpen(false)}>Cancel</Button><Button variant="accent" onClick={renameBoard}>Rename</Button></>}><label className="text-field"><span>Board name</span><input autoFocus value={renameDraft} maxLength={120} onChange={(event) => setRenameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') renameBoard(); }} /></label></Dialog>
+    <Dialog open={confirmAction !== null} title={confirmAction === 'clear' ? 'Clear board?' : 'Delete selected terrain?'} onClose={() => setConfirmAction(null)} actions={<><Button variant="quiet" onClick={() => setConfirmAction(null)}>Cancel</Button><Button variant="danger" onClick={resolveConfirm}>{confirmAction === 'clear' ? 'Clear board' : `Delete ${selectedIds.length} objects`}</Button></>}><p>{confirmAction === 'clear' ? `This removes all ${board.pieces.length} terrain pieces from ${board.name}.` : 'This removes every selected terrain piece.'} You can undo the action immediately.</p></Dialog>
+    <Dialog open={Boolean(importError)} title="Import failed" onClose={() => setImportError(null)} actions={<Button variant="accent" onClick={() => setImportError(null)}>Keep current board</Button>}><p>Your current board was not changed.</p><p><strong>Problem:</strong> {importError}</p><p>Choose a JSON export created by Battle Builder, confirm it includes a supported schema version and valid board/terrain values, then try again.</p></Dialog>
     <Dialog open={helpOpen} title="Workspace controls" onClose={() => setHelpOpen(false)} actions={<Button variant="accent" onClick={() => setHelpOpen(false)}>Done</Button>}><p>Build opens a searchable catalog; Layers finds, orders, locks, and hides terrain; Setup safely configures the board. Precise construction remains on the central board.</p><dl className="help-list"><div><dt>Camera</dt><dd>Middle / Shift-drag pans, wheel zooms, F fits, and 1–4 changes views.</dd></div><div><dt>Keyboard</dt><dd>V Select, B Build, A Access, H/J/K/L move, R rotates, Ctrl+D duplicates, Delete removes.</dd></div></dl></Dialog>
     <ToastRegion toasts={toasts} />
   </div>;

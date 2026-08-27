@@ -10,6 +10,17 @@ _No active defects recorded._
 
 ## Completed
 
+- **B08-001 — Board actions were incomplete and split between placeholder menu
+  feedback and unconnected persistence code.** Connected the single Board menu
+  to New, Rename, browser Save/Open, board duplication, JSON export/import,
+  Clear, and settings/help; added saved-board chooser, draft status, bounded
+  undo/redo, and undoable destructive confirmations.
+- **B08-002 — Import and corrupt-draft recovery could make a user uncertain
+  whether a board was lost.** Added strict non-destructive import validation,
+  clear recovery instructions, active-board retention on failure, and an
+  initial corrupt-draft write guard. Verified with schema/history tests,
+  isolated import/recovery browser flows, and desktop recovery captures.
+
 - **B07-001 — The Build, Layers, and Setup drawers were placeholder shells,
   leaving planner controls undiscoverable.** Added a searchable grouped catalog
   with favorites, recents, collapsed categories, and immediate placement;
