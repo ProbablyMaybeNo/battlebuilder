@@ -6,7 +6,7 @@ export const MIN_BOARD_SIZE_INCHES = 12;
 export const MAX_BOARD_SIZE_INCHES = 72;
 export const GRID_CELL_SIZE_INCHES = 1 as const;
 
-export type PieceKind = 'building' | 'ruin' | 'platform' | 'road' | 'water' | 'wall' | 'woods' | 'rocks' | 'scatter' | 'objective' | 'marker';
+export type PieceKind = 'building' | 'ruin' | 'platform' | 'road' | 'water' | 'wall' | 'woods' | 'rocks' | 'scatter' | 'objective' | 'token' | 'marker';
 export type Surface = 'midnight' | 'concrete' | 'sand';
 export type Orientation = 'landscape' | 'portrait';
 export type RoofMode = 'roof' | 'interior';
@@ -52,7 +52,7 @@ export interface BoardDocument {
 }
 export type ImportResult = { ok: true; document: BoardDocument } | { ok: false; message: string };
 
-export const pieceKinds: readonly PieceKind[] = ['building', 'ruin', 'platform', 'road', 'water', 'wall', 'woods', 'rocks', 'scatter', 'objective', 'marker'] as const;
+export const pieceKinds: readonly PieceKind[] = ['building', 'ruin', 'platform', 'road', 'water', 'wall', 'woods', 'rocks', 'scatter', 'objective', 'token', 'marker'] as const;
 const structureKinds = new Set<PieceKind>(['building', 'ruin', 'platform']);
 const wallSides = new Set<WallSide>(['north', 'east', 'south', 'west']);
 const roofModes = new Set<RoofMode>(['roof', 'interior']);
@@ -244,5 +244,10 @@ export function starterBoard(options: BoardFactoryOptions = {}): BoardDocument {
   let serial = 0; const idFactory = options.idFactory ?? (() => crypto.randomUUID());
   const board = newBoard({ ...options, name: options.name ?? 'Ashfall crossing', idFactory });
   const pieceId = () => `${idFactory()}-${serial += 1}`;
-  return parseBoard({ ...board, pieces: [starterPiece(pieceId(), 'building', 'Relay station', 4, 5, 8, 5, 1), starterPiece(pieceId(), 'ruin', 'Broken annex', 21, 5, 6, 7, 2), starterPiece(pieceId(), 'road', 'North service road', 2, 19, 32, 3, 0), starterPiece(pieceId(), 'woods', 'Hollow copse', 25, 25, 8, 5, 3), starterPiece(pieceId(), 'objective', 'Signal cache', 16, 27, 2, 2, 4)] });
+  return parseBoard({ ...board, pieces: [
+    starterPiece(pieceId(), 'building', 'Relay station', 3, 4, 7, 5, 2), starterPiece(pieceId(), 'ruin', 'Broken annex', 24, 4, 6, 6, 2), starterPiece(pieceId(), 'platform', 'Loading platform', 13, 11, 5, 3, 2),
+    starterPiece(pieceId(), 'road', 'North service road', 2, 19, 32, 2, 0), starterPiece(pieceId(), 'water', 'Drainage channel', 4, 30, 12, 2, 0), starterPiece(pieceId(), 'wall', 'Forward barricade', 21, 26, 7, 1, 3),
+    starterPiece(pieceId(), 'woods', 'Hollow copse', 26, 28, 7, 5, 1), starterPiece(pieceId(), 'rocks', 'Basalt outcrop', 5, 25, 5, 3, 1), starterPiece(pieceId(), 'scatter', 'Supply debris', 15, 27, 3, 2, 3),
+    starterPiece(pieceId(), 'objective', 'Signal cache', 17, 5, 2, 2, 4), starterPiece(pieceId(), 'token', 'Survey token', 11, 29, 1, 1, 4), starterPiece(pieceId(), 'marker', 'Approach marker', 31, 13, 1, 1, 4),
+  ] });
 }

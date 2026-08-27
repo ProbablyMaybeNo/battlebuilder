@@ -25,7 +25,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | B02 | Design system and workspace shell | B00 | Complete |
 | B03 | Overhead editor, 1-inch board grid, and camera | B01, B02 | Complete |
 | B04 | 3D planning renderer and camera | B01, B02, B03 | Complete |
-| B05 | Tactical terrain catalog and shared geometry | B01, B03, B04 | Not started |
+| B05 | Tactical terrain catalog and shared geometry | B01, B03, B04 | Complete |
 | B06 | Build, transform, structure, access, and join tools | B03, B04, B05 | Not started |
 | B07 | Drawers, layers, inspector, and board settings | B01, B02, B05, B06 | Not started |
 | B08 | Board lifecycle, history, import/export, and recovery | B01, B06, B07 | Not started |

@@ -10,6 +10,16 @@ _No active defects recorded._
 
 ## Completed
 
+- **B05-001 — Terrain pieces rendered as generic 3D boxes and did not share a
+  tactical visual grammar with overhead.** Replaced them with a shared terrain
+  catalog and geometry service, data-driven SVG cartography, corresponding 3D
+  mesh parts/materials, stable labels, and structure door/window marks.
+  Verified with 22 unit tests, isolated browser checks, and populated
+  1440×960/1920×1080 overhead and 3D captures.
+- **B05-002 — The zero-state overlay remained visible after loading terrain,
+  obscuring the usable board.** Restricted the zero state to empty documents;
+  populated boards now expose the full overhead or 3D planning surface.
+
 - **B04-001 — The planner had no true 3D board view.** Added a lazy Three.js renderer sharing the B01 board, 1-inch grid scale, surface state, terrain meshes, camera presets, pointer controls, picking scaffold, resize cleanup, and separate lazy chunk budget.
 
 - **B03-001 — The shell had a decorative board placeholder rather than a precision editing surface.** Replaced it with a renderer-neutral SVG viewport: fixed one-inch lines, 12-inch major references, board frame, origin/ruler labels, coordinate readout, surface variants, and clamped mouse/keyboard camera controls.

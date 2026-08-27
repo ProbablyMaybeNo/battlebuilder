@@ -67,3 +67,20 @@ B03 own the first visible workspace and board review.
   camera; no 3D code was introduced.
 - `lint`, `typecheck`, build, bundle:check (225.8 KiB / 350 KiB), audit, and
   isolated Playwright/axe checks all passed.
+
+## B05 — tactical terrain and shared geometry verification (2026-08-26)
+
+- Visual review passed for populated overhead and isometric 3D boards at
+  1440×960 and 1920×1080. The board remains dominant; buildings, ruins,
+  roads, water, walls, woods, rocks, scatter, objectives, tokens, and markers
+  use distinct tactical symbols rather than generic translucent rectangles.
+- Captures: `b05-populated-overhead-1440x960.png`,
+  `b05-populated-overhead-1920x1080.png`,
+  `b05-populated-3d-1440x960.png`, and
+  `b05-populated-3d-1920x1080.png`.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (22 tests), `pnpm build`,
+  `pnpm bundle:check` (239.9 KiB initial / 350 KiB; 513.1 KiB lazy 3D /
+  700 KiB), `pnpm audit`, and `pnpm test:e2e` (9 isolated Chromium checks)
+  passed.
+- The `agent-browser` CLI remains unavailable. Isolated Playwright was used
+  for screenshot, console, viewport, and axe fallback verification.
