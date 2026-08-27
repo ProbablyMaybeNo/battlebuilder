@@ -10,6 +10,19 @@ _No active defects recorded._
 
 ## Completed
 
+- **B06-001 — The tactical board had rendered terrain but no safe construction
+  workflow.** Added immutable construction commands with collision/bounds
+  validation; Select, Build, neutral, and Access modes; snapped drag previews;
+  multi-select/marquee; move, resize, rotate, duplicate, delete, and undo/redo;
+  compatible union-footprint joins; and exterior door/window editing shared by
+  overhead and 3D. Verified with 26 unit tests, 13 isolated browser checks, and
+  selection-state captures at both desktop review sizes.
+- **B06-002 — Cancellation, locking, invalid placement, and incompatible joins
+  could leave unclear or unsafe transform outcomes.** Added pointer capture and
+  cancel/lost-capture/blur recovery, bounded and collision-checked mutations,
+  locked-piece protection, visual valid/invalid previews, and reasoned join
+  feedback. Verified in focused Playwright construction flows.
+
 - **B05-001 — Terrain pieces rendered as generic 3D boxes and did not share a
   tactical visual grammar with overhead.** Replaced them with a shared terrain
   catalog and geometry service, data-driven SVG cartography, corresponding 3D

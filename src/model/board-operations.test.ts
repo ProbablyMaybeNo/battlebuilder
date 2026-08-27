@@ -1,0 +1,11 @@
+import { describe, expect, it } from 'vitest';
+import { createPiece, addAccess, joinStructures, movePieces, placementResult, resizePiece } from './board-operations';
+import { createStructureDetails, newBoard, type Piece } from '../document/schema';
+
+const make = (id: string, x: number, y: number, width = 3, height = 3): Piece => ({ id, kind: 'building', name: id, x, y, width, height, rotation: 0, locked: false, hidden: false, layer: 1, notes: '', structureDetails: createStructureDetails(width, height) });
+describe('construction operations', () => {
+  it('creates catalog pieces and rejects collisions and off-board transforms', () => { const board = { ...newBoard(), pieces: [make('a', 2, 2)] }; const piece = createPiece(board, 'building', 6, 2, 2, 2); expect(piece.name).toBe('Building'); expect(placementResult(board, piece).ok).toBe(true); expect(placementResult(board, { ...piece, x: 3 }).ok).toBe(false); expect(movePieces(board, ['a'], 40, 0).result).toEqual({ ok: false, reason: 'off-board' }); });
+  it('resizes structures while pruning impossible access features', () => { const piece = addAccess(make('a', 1, 1, 4, 4), 'door', 'east', 3)!; const resized = resizePiece(piece, 2, 2); expect(resized.structureDetails?.doors).toHaveLength(0); expect(resized.structureDetails?.footprint.kind).toBe('cells'); });
+  it('joins compatible edge-adjacent structures into a union footprint and preserves exterior access', () => { const left = addAccess(make('a', 2, 2), 'door', 'north', 1)!; const right = make('b', 5, 2); const result = joinStructures({ ...newBoard(), pieces: [left, right] }, ['a', 'b']); expect(result.ok).toBe(true); if (result.ok) { expect(result.piece.width).toBe(6); expect(result.piece.structureDetails?.footprint).toMatchObject({ kind: 'cells' }); expect(result.piece.structureDetails?.doors[0].offset).toBe(1); } });
+  it('explains non-contiguous and incompatible joins', () => { const first = make('a', 1, 1); const second = make('b', 8, 1); expect(joinStructures({ ...newBoard(), pieces: [first, second] }, ['a', 'b'])).toEqual({ ok: false, reason: 'gap' }); expect(joinStructures({ ...newBoard(), pieces: [first, { ...second, kind: 'ruin' }] }, ['a', 'b'])).toEqual({ ok: false, reason: 'type' }); });
+});

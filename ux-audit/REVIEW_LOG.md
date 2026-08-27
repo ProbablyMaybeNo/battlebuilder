@@ -85,3 +85,22 @@ B03 own the first visible workspace and board review.
   passed.
 - The `agent-browser` CLI remains unavailable. Isolated Playwright was used
   for screenshot, console, viewport, and axe fallback verification.
+
+## B06 — construction, transform, access, and join verification (2026-08-26)
+
+- Visual review passed at 1440×960 and 1920×1080 for a selected structure with
+  authored resize/rotate handles, the compact transform shelf, and the
+  type-aware inspector. The board remains primary and no panel is clipped.
+  Captures: `b06-construction-1440x960.png` and
+  `b06-construction-1920x1080.png`.
+- Unit coverage passed (26 tests): snapped piece construction, bounds and
+  collision outcomes, resize access pruning, compatible union-footprint joins,
+  attachment retention, and rejected gap/type joins.
+- Isolated Playwright passed all 13 Chromium checks, including focused Build,
+  Select, keyboard rotate, duplicate, Escape cancellation, Access door edit,
+  unavailable join feedback, legacy workspace/3D flows, and target-size
+  captures. Browser storage remained under the e2e fixture namespace.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit`, and
+  `pnpm bundle:check` passed. Initial route is 259.0 KiB / 350 KiB; lazy 3D is
+  513.1 KiB / 700 KiB. Playwright is used for browser review because the local
+  `agent-browser` CLI is unavailable.
