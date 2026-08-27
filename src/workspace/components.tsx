@@ -66,20 +66,29 @@ export function Dialog({ open, title, onClose, children, actions }: { open: bool
   return <div className="dialog-backdrop" role="presentation"><div ref={dialogRef} className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><div className="dialog__header"><h2 id="dialog-title">{title}</h2><IconButton label="Close dialog" data-autofocus onClick={onClose}>×</IconButton></div><div className="dialog__body">{children}</div>{actions && <div className="dialog__actions">{actions}</div>}</div></div>;
 }
 
-export function Popover({ open, label, children }: { open: boolean; label: string; children: ReactNode }) {
-  return open ? <div className="popover" role="dialog" aria-label={label}>{children}</div> : null;
+export function Popover({ open, label, onClose, children }: { open: boolean; label: string; onClose: () => void; children: ReactNode }) {
+  const popoverRef = useRef<HTMLDivElement>(null); const priorFocus = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    priorFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const timer = window.setTimeout(() => popoverRef.current?.focus(), 0);
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); } };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => { window.clearTimeout(timer); window.removeEventListener('keydown', onKeyDown, true); priorFocus.current?.focus(); };
+  }, [open, onClose]);
+  return open ? <div ref={popoverRef} className="popover" role="dialog" aria-label={label} tabIndex={-1}>{children}</div> : null;
 }
 
 export function Tabs({ tabs, selected, onSelect }: { tabs: Array<{ id: string; label: string; content: ReactNode }>; selected: string; onSelect: (id: string) => void }) {
-  const baseId = useId(); const current = tabs.find((tab) => tab.id === selected) ?? tabs[0];
+  const baseId = useId(); const current = tabs.find((tab) => tab.id === selected) ?? tabs[0]; const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const index = tabs.findIndex((tab) => tab.id === selected);
+    const index = tabs.findIndex((tab) => tab.id === (event.target as HTMLElement).dataset.tabId);
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
-    onSelect(tabs[next].id);
+    onSelect(tabs[next].id); tabRefs.current[next]?.focus();
   };
-  return <div className="tabs"><div className="tabs__list" role="tablist" aria-label="Inspector sections" onKeyDown={onKeyDown}>{tabs.map((tab) => <button key={tab.id} className="tabs__tab" role="tab" type="button" aria-selected={tab.id === current.id} aria-controls={`${baseId}-${tab.id}`} tabIndex={tab.id === current.id ? 0 : -1} onClick={() => onSelect(tab.id)}>{tab.label}</button>)}</div><div id={`${baseId}-${current.id}`} className="tabs__panel" role="tabpanel">{current.content}</div></div>;
+  return <div className="tabs"><div className="tabs__list" role="tablist" aria-label="Inspector sections" onKeyDown={onKeyDown}>{tabs.map((tab, index) => <button ref={(element) => { tabRefs.current[index] = element; }} key={tab.id} data-tab-id={tab.id} className="tabs__tab" role="tab" type="button" aria-selected={tab.id === current.id} aria-controls={`${baseId}-${tab.id}`} tabIndex={tab.id === current.id ? 0 : -1} onClick={() => onSelect(tab.id)}>{tab.label}</button>)}</div><div id={`${baseId}-${current.id}`} className="tabs__panel" role="tabpanel">{current.content}</div></div>;
 }
 
 export function NumberField({ label, value, min, max, onCommit }: { label: string; value: number; min?: number; max?: number; onCommit: (value: number) => void }) {

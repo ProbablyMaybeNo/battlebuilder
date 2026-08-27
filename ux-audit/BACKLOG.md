@@ -10,6 +10,17 @@ _No active defects recorded._
 
 ## Completed
 
+- **B09-001 — Terrain and 3D planning controls were not fully discoverable or
+  operable without a pointer.** Added named, focusable SVG pieces with authored
+  focus treatment; a semantic 3D terrain list; keyboard camera/build/access
+  alternatives; selection announcements; and a keyboard placement command.
+  Verified through isolated keyboard, reduced-motion, 3D, and axe browser flows.
+- **B09-002 — Focus could be lost or feedback could rely on visual state in
+  popovers, tabs, and transient pointer operations.** Added Popover Escape and
+  restoration, focused tab roving, visible non-colour focus/lock/selection
+  affordances, and safe 3D pointer cancel/lost-capture/blur cleanup. Verified
+  with 30 Chromium checks and target-size focused-board captures.
+
 - **B08-001 — Board actions were incomplete and split between placeholder menu
   feedback and unconnected persistence code.** Connected the single Board menu
   to New, Rename, browser Save/Open, board duplication, JSON export/import,

@@ -138,3 +138,23 @@ B03 own the first visible workspace and board review.
   unit tests), `pnpm build`, `pnpm audit`, `pnpm bundle:check`, and `pnpm
   test:e2e` (25 isolated Chromium checks). Initial route is 275.1 KiB / 350
   KiB; lazy 3D is 513.1 KiB / 700 KiB.
+
+## B09 — accessibility and resilient-input verification (2026-08-26)
+
+- Manual keyboard-path review and isolated browser coverage confirm named,
+  focusable overhead terrain; an equivalent semantic 3D terrain list; keyboard
+  selection, build placement, camera pan/zoom/reset, access creation, Layers,
+  menu, inspector tab, and Popover Escape/focus restoration paths. Selection,
+  locks, invalid previews, and focus have authored non-colour feedback.
+- Pointer cancel, lost capture, window blur, touch input, browser focus, and
+  reduced-motion paths clear transient work without committing a mutation.
+  Axe has no serious or critical violations for the full 3D/overhead canvas
+  workflow, drawers, inspector, dialogs, and recovery states.
+- Visual review passed at 1440×960 and 1920×1080 for focused terrain states:
+  `b09-accessibility-1440x960.png` and `b09-accessibility-1920x1080.png`.
+  The focus ring remains distinct from the selection bracket and neither target
+  view clips the board grid.
+- Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (28
+  unit tests), `pnpm test:e2e` (30 isolated Chromium checks), `pnpm build`,
+  `pnpm audit`, and `pnpm bundle:check` (277.6 KiB initial / 350 KiB;
+  514.7 KiB lazy 3D / 700 KiB).

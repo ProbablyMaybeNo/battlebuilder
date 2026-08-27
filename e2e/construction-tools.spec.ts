@@ -18,13 +18,9 @@ test('constructs, selects, transforms, duplicates, and safely cancels board inte
 
   await page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' }).click();
   await page.getByRole('button', { name: /Field building/ }).first().click();
-  const box = await board.boundingBox();
-  if (!box) throw new Error('Board did not have a box');
-  await page.mouse.move(box.x + box.width * .08, box.y + box.height * .38);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width * .13, box.y + box.height * .43);
-  await page.mouse.up();
-  await expect(page.getByText(/built at/)).toBeVisible();
+  await page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' }).click();
+  await page.getByRole('complementary', { name: 'Build' }).getByRole('button', { name: 'Place selected terrain at first open cell' }).click();
+  await expect(page.getByText(/placed at the first open cell/)).toBeVisible();
   await page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' }).click();
   await page.keyboard.press('Escape');
   await expect(page.locator('.construction-preview')).toHaveCount(0);

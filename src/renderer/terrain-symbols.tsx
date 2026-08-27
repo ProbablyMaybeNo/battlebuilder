@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, KeyboardEvent } from 'react';
 import type { Piece } from '../document/schema';
 import { accessiblePieceName } from '../model/catalog';
 import { terrainGeometry, type TerrainLabel, type TerrainVisualState } from '../model/geometry';
@@ -45,7 +45,12 @@ export function TerrainPieceSvg({ piece, state, label }: { piece: Piece; state: 
   if (state === 'hidden') return null;
   const transform = `translate(${piece.x} ${piece.y}) rotate(${piece.rotation} ${piece.width / 2} ${piece.height / 2})`;
   const style = { '--terrain-label-width': `${label?.width ?? 0}px` } as CSSProperties;
-  return <g className={`terrain-piece terrain-piece--${state}`} data-terrain-kind={piece.kind} data-terrain-state={state} transform={transform} aria-label={accessiblePieceName(piece)} role="group" style={style}>
+  const selectFromKeyboard = (event: KeyboardEvent<SVGGElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    window.dispatchEvent(new CustomEvent('battle-builder:piece-key-select', { detail: { id: piece.id, shiftKey: event.shiftKey } }));
+  };
+  return <g className={`terrain-piece terrain-piece--${state}`} data-terrain-kind={piece.kind} data-terrain-state={state} transform={transform} aria-label={accessiblePieceName(piece)} aria-pressed={state === 'selected' || state === 'multi-selected'} aria-disabled={piece.locked || undefined} role="button" tabIndex={0} onKeyDown={selectFromKeyboard} style={style}>
     <title>{accessiblePieceName(piece)}</title><Symbol piece={piece} />
     {piece.locked && <path d={`M${piece.width - .62} .62v-.16a.22.22 0 0 0-.44 0v.16m-.1 0h.64v.5h-.64z`} className="terrain-lock" />}
     {label && <g className={`terrain-label ${label.detail ? 'terrain-label--detail' : ''}`} transform={`translate(${piece.width / 2} ${piece.height / 2})`}><rect x={-label.width / 2} y="-.38" width={label.width} height=".76" rx=".12" /><text textAnchor="middle" y=".1">{label.detail ? `${piece.name} · ${piece.width}×${piece.height} in` : piece.name}</text></g>}
