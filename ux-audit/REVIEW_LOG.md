@@ -77,7 +77,8 @@ B03 own the first visible workspace and board review.
 - Captures: `b05-populated-overhead-1440x960.png`,
   `b05-populated-overhead-1920x1080.png`,
   `b05-populated-3d-1440x960.png`, and
-  `b05-populated-3d-1920x1080.png`.
+  `b05-populated-3d-1920x1080.png`; zero-state baseline captures are also
+  retained at `b05-overhead-1440x960.png` and `b05-overhead-1920x1080.png`.
 - `pnpm lint`, `pnpm typecheck`, `pnpm test` (22 tests), `pnpm build`,
   `pnpm bundle:check` (239.9 KiB initial / 350 KiB; 513.1 KiB lazy 3D /
   700 KiB), `pnpm audit`, and `pnpm test:e2e` (9 isolated Chromium checks)
