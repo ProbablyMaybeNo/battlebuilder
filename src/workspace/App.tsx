@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, ChevronDown, CircleHelp, Copy, Crosshair, FilePlus2, FolderOpen, Grid3X3, Hammer, Layers3, Maximize2, Minus, MousePointer2, Pencil, Plus, Redo2, Save, Settings2, Trash2, Undo2, Upload } from 'lucide-react';
+import { Box, ChevronDown, CircleHelp, Copy, Crosshair, FilePlus2, FolderOpen, Grid3X3, Hammer, Layers3, Maximize2, Minus, MousePointer2, Pencil, Plus, Redo2, Save, Settings2, Swords, Trash2, Undo2, Upload, Users } from 'lucide-react';
 import { createHistory, commit, redo, undo, type History } from '../document/history';
 import { newBoard, parseBoard, starterBoard, validateImport, type BoardDocument, type Piece, type PieceKind, type WallSide } from '../document/schema';
 import { createDraftPersistence, listSavedBoards, openSavedBoard, restoreDraft, saveBoard, type SaveState, type SavedBoardSummary } from '../document/persistence';
@@ -9,9 +9,14 @@ import { addAccess, createPiece, joinStructures, movePieces, normalizeRotation, 
 import { OverheadBoard, type BoardMode } from '../renderer/overhead';
 import { BoardPanel, BuildPanel, InspectorPanel, LayersPanel, SetupPanel } from './panels';
 import { Button, Dialog, Drawer, IconButton, Menu, MenuItem, Popover, ToastRegion, type Toast } from './components';
+import { BattleInspector, DeploymentPanel, RosterPanel, type UnitTemplate } from './battle-panels';
+import type { BattleFaction, BattlePosition, BattleSession, BattleUnit } from '../simulation/contracts';
+import { deploymentZones, validateDeployment } from '../simulation/deployment';
+import { restoreBattleSessionDraft, saveBattleSessionDraftNow } from '../simulation/persistence';
+import { reduceBattleSession } from '../simulation/reducer';
 
 const ThreeBoard = lazy(async () => ({ default: (await import('../renderer/three-board')).ThreeBoard }));
-type DrawerId = 'board' | 'build' | 'layers' | 'setup';
+type DrawerId = 'board' | 'build' | 'layers' | 'setup' | 'roster' | 'deploy';
 type AccessType = 'door' | 'window';
 type ConfirmAction = 'clear' | 'delete' | null;
 const drawerMeta = [
@@ -19,10 +24,24 @@ const drawerMeta = [
   { id: 'layers' as const, label: 'Layers', icon: Layers3 }, { id: 'setup' as const, label: 'Setup', icon: Settings2 },
 ];
 
+const defaultFactions = (): BattleFaction[] => [{ id: 'cyan-command', name: 'Cyan command' }, { id: 'violet-command', name: 'Violet command' }];
+const createBattleSession = (board: BoardDocument, factions: readonly BattleFaction[] = defaultFactions(), units: readonly BattleUnit[] = []): BattleSession => {
+  const at = new Date().toISOString();
+  const created = reduceBattleSession(null, { type: 'session.create', id: crypto.randomUUID(), at, sessionId: crypto.randomUUID(), name: `${board.name} engagement`, board, seed: `battle-${board.id}`, adapter: { id: 'battle-builder-generic', version: '1' }, factions, units, objectives: board.pieces.filter((piece) => piece.kind === 'objective').map((piece) => ({ id: `objective-${piece.id}`, sourcePieceId: piece.id, state: 'unclaimed' })) });
+  if (!created.ok) throw new Error(created.message);
+  const phase = reduceBattleSession(created.session, { type: 'phase.change', id: crypto.randomUUID(), at, phase: 'deployment', activeFactionId: created.session.factions[0]?.id ?? null, round: 1 });
+  if (!phase.ok) throw new Error(phase.message);
+  return phase.session;
+};
+
 export function App() {
   const [history, setHistory] = useState<History>(() => createHistory(newBoard()));
   const board = history.present;
   const [activeDrawer, setActiveDrawer] = useState<DrawerId | null>(null);
+  const [workspaceMode, setWorkspaceMode] = useState<'build' | 'battle'>('build');
+  const [battleSession, setBattleSession] = useState<BattleSession | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [deploymentPosition, setDeploymentPosition] = useState<BattlePosition>({ x: 0, y: 0 });
   const [mode, setMode] = useState<BoardMode>('neutral');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [hoveredPieceId, setHoveredPieceId] = useState<string | null>(null);
@@ -59,6 +78,7 @@ export function App() {
     return () => { draftPersistence.flush(); };
   }, []);
   useEffect(() => { if (!hydrated) return; if (skipInitialDraftWrite.current) { skipInitialDraftWrite.current = false; return; } draftPersistence.schedule(board); }, [board, hydrated]);
+  useEffect(() => { if (battleSession) saveBattleSessionDraftNow(window.localStorage, battleSession); }, [battleSession]);
 
   const addBuild = (kind: PieceKind, x: number, y: number, width: number, height: number) => {
     const piece = createPiece(board, kind, x, y, width, height); const result = placementResult(board, piece);
@@ -127,6 +147,45 @@ export function App() {
     setHistory((current) => ({ ...current, present: result.value }));
     draftPersistence.schedule(result.value); refreshSavedBoards(); announce('Board saved to this browser.', 'success');
   };
+  const enterBattle = () => {
+    if (battleSession && battleSession.board.boardId === board.id && battleSession.board.snapshot.updatedAt === board.updatedAt) {
+      setWorkspaceMode('battle'); setSelectedUnitId(null); setMode('neutral'); setActiveDrawer('roster'); announce('Returned to the preserved battle session.', 'success'); return;
+    }
+    const saved = saveBoard(window.localStorage, board);
+    if (!saved.ok) { announce(`Battle mode needs a safe local board save: ${saved.message}`, 'warning'); return; }
+    setHistory((current) => ({ ...current, present: saved.value }));
+    const restored = restoreBattleSessionDraft(window.localStorage);
+    const reusable = restored.status === 'restored' && restored.session.board.boardId === saved.value.id && restored.session.board.snapshot.updatedAt === saved.value.updatedAt;
+    const session = reusable && restored.status === 'restored' ? restored.session : createBattleSession(saved.value);
+    setBattleSession(session); setSelectedUnitId(null); setWorkspaceMode('battle'); setMode('neutral'); setActiveDrawer('roster');
+    announce(reusable ? 'Battle session restored from this board snapshot.' : 'Board saved and a fresh deployment session is ready.', 'success');
+  };
+  const returnToBuild = () => { setWorkspaceMode('build'); setActiveDrawer(null); setSelectedUnitId(null); setMode('neutral'); announce('Returned to Build mode. Your board and battle session are both preserved.', 'success'); };
+  const resetRoster = (factions: readonly BattleFaction[], units: readonly BattleUnit[], message: string) => {
+    if (!battleSession) return;
+    const source = battleSession.board.snapshot;
+    try { const next = createBattleSession(source, factions, units.map((unit) => ({ ...unit, position: null }))); setBattleSession(next); setSelectedUnitId(null); announce(`${message} Deployment was reset safely.`, 'success'); }
+    catch (error) { announce(error instanceof Error ? error.message : 'Roster could not be updated.', 'warning'); }
+  };
+  const addFaction = () => {
+    if (!battleSession) return;
+    const faction: BattleFaction = { id: crypto.randomUUID(), name: `Faction ${battleSession.factions.length + 1}` };
+    resetRoster([...battleSession.factions, faction], battleSession.units, `${faction.name} added.`);
+  };
+  const addUnit = (template: UnitTemplate) => {
+    if (!battleSession) return;
+    const faction = battleSession.factions[0]; if (!faction) return;
+    const unit: BattleUnit = { id: crypto.randomUUID(), factionId: faction.id, name: `${template.name} ${battleSession.units.filter((entry) => entry.factionId === faction.id).length + 1}`, position: null };
+    resetRoster(battleSession.factions, [...battleSession.units, unit], `${unit.name} added to ${faction.name}.`);
+  };
+  const deploySelected = () => {
+    if (!battleSession) return;
+    const validation = validateDeployment(battleSession, selectedUnitId ?? '', deploymentPosition);
+    if (!validation.ok) { announce(`Deployment blocked: ${validation.reason}`, 'warning'); return; }
+    const result = reduceBattleSession(battleSession, { type: 'unit.deploy', id: crypto.randomUUID(), at: new Date().toISOString(), unitId: selectedUnitId!, position: deploymentPosition });
+    if (!result.ok) { announce(result.message, 'warning'); return; }
+    setBattleSession(result.session); announce(`Unit deployed in ${validation.zone.label}.`, 'success');
+  };
   const openLibrary = () => { refreshSavedBoards(); setOpenBoardsOpen(true); };
   const openBoard = (id: string) => {
     const result = openSavedBoard(window.localStorage, id);
@@ -180,29 +239,28 @@ export function App() {
 
   return <div className="app-shell">
     <header className="document-bar">
-      <div className="brand"><span className="brand__mark" aria-hidden="true"><Crosshair size={17} /></span><span>Battle Builder</span><span className="brand__phase">Board planner</span></div>
+      <div className="brand"><span className="brand__mark" aria-hidden="true"><Crosshair size={17} /></span><span>Battle Builder</span><span className="brand__phase">{workspaceMode === 'battle' ? 'Battle mode' : 'Board planner'}</span></div>
       <label className="board-name"><span className="sr-only">Board name</span><input value={board.name} onChange={(event) => mutate({ ...board, name: event.target.value })} /></label>
       <span className={`save-state save-state--${saveState}`}><Save size={14} />{saveState === 'pending' ? 'Saving draft…' : saveState === 'saved' ? 'Draft saved' : saveState === 'error' ? 'Draft save error' : 'Draft ready'}</span>
       <div className="document-actions" aria-label="Document history"><IconButton label="Undo" tooltip="Undo (Ctrl+Z)" disabled={!history.past.length} onClick={() => setHistory(undo)}><Undo2 size={16} /></IconButton><IconButton label="Redo" tooltip="Redo (Ctrl+Shift+Z)" disabled={!history.future.length} onClick={() => setHistory(redo)}><Redo2 size={16} /></IconButton></div>
-      <Menu label="Board menu" trigger={<><span>Board</span><ChevronDown size={14} /></>}>{(close) => <><MenuItem onSelect={() => { close(); command(newBoard(), 'New board created.', []); setMode('neutral'); }}><FilePlus2 size={15} />New board</MenuItem><MenuItem onSelect={() => { close(); setRenameDraft(board.name); setRenameOpen(true); }}><Pencil size={15} />Rename</MenuItem><MenuItem onSelect={() => { close(); saveCurrent(); }}><Save size={15} />Save</MenuItem><MenuItem onSelect={() => { close(); openLibrary(); }}><FolderOpen size={15} />Open…</MenuItem><MenuItem onSelect={() => { close(); duplicateBoard(); }}><Copy size={15} />Duplicate board</MenuItem><MenuItem onSelect={() => { close(); exportBoard(); }}><Save size={15} />Export JSON</MenuItem><MenuItem onSelect={() => { close(); importInput.current?.click(); }}><Upload size={15} />Import JSON…</MenuItem><MenuItem onSelect={() => { close(); setConfirmAction('clear'); }} disabled={!board.pieces.length}><Trash2 size={15} />Clear board</MenuItem><MenuItem onSelect={() => { close(); toggleDrawer('setup'); }}><Settings2 size={15} />Board settings</MenuItem><MenuItem onSelect={() => { close(); setHelpOpen(true); }}><CircleHelp size={15} />Help & controls</MenuItem></>}</Menu>
+      <Button variant={workspaceMode === 'battle' ? 'accent' : 'quiet'} aria-pressed={workspaceMode === 'battle'} onClick={workspaceMode === 'battle' ? returnToBuild : enterBattle}><Swords size={15} />{workspaceMode === 'battle' ? 'Return to Build' : 'Enter Battle'}</Button>
+      {workspaceMode === 'build' && <Menu label="Board menu" trigger={<><span>Board</span><ChevronDown size={14} /></>}>{(close) => <><MenuItem onSelect={() => { close(); command(newBoard(), 'New board created.', []); setMode('neutral'); }}><FilePlus2 size={15} />New board</MenuItem><MenuItem onSelect={() => { close(); setRenameDraft(board.name); setRenameOpen(true); }}><Pencil size={15} />Rename</MenuItem><MenuItem onSelect={() => { close(); saveCurrent(); }}><Save size={15} />Save</MenuItem><MenuItem onSelect={() => { close(); openLibrary(); }}><FolderOpen size={15} />Open…</MenuItem><MenuItem onSelect={() => { close(); duplicateBoard(); }}><Copy size={15} />Duplicate board</MenuItem><MenuItem onSelect={() => { close(); exportBoard(); }}><Save size={15} />Export JSON</MenuItem><MenuItem onSelect={() => { close(); importInput.current?.click(); }}><Upload size={15} />Import JSON…</MenuItem><MenuItem onSelect={() => { close(); setConfirmAction('clear'); }} disabled={!board.pieces.length}><Trash2 size={15} />Clear board</MenuItem><MenuItem onSelect={() => { close(); toggleDrawer('setup'); }}><Settings2 size={15} />Board settings</MenuItem><MenuItem onSelect={() => { close(); setHelpOpen(true); }}><CircleHelp size={15} />Help & controls</MenuItem></>}</Menu>}
     </header>
     <div className="workspace-layout">
-      <nav className="activity-rail" aria-label="Workspace sections">{drawerMeta.map(({ id, label, icon: Icon }) => <IconButton key={id} label={label} tooltip={label} className={activeDrawer === id ? 'is-active' : undefined} aria-pressed={activeDrawer === id} onClick={() => toggleDrawer(id)}><Icon size={19} /></IconButton>)}</nav>
+      <nav className="activity-rail" aria-label="Workspace sections">{(workspaceMode === 'battle' ? [{ id: 'roster' as const, label: 'Roster', icon: Users }, { id: 'deploy' as const, label: 'Deploy', icon: Crosshair }] : drawerMeta).map(({ id, label, icon: Icon }) => <IconButton key={id} label={label} tooltip={label} className={activeDrawer === id ? 'is-active' : undefined} aria-pressed={activeDrawer === id} onClick={() => toggleDrawer(id)}><Icon size={19} /></IconButton>)}</nav>
       <main className="workspace" aria-label="Battle Builder workspace">
         <section className="canvas-stage" aria-label="Board workspace">
-          <div className="canvas-stage__header"><div><span className="eyebrow">Precision board workspace</span><span className="board-dimensions">{board.settings.widthInches} × {board.settings.heightInches} in · fixed 1 in grid</span></div><div className="view-switcher" aria-label="Board view"><Button variant={view === 'overhead' ? 'accent' : 'quiet'} aria-pressed={view === 'overhead'} onClick={() => setView('overhead')}>Overhead</Button><Button variant={view === '3d' ? 'accent' : 'quiet'} aria-pressed={view === '3d'} onClick={() => setView('3d')}>3D planning</Button></div></div>
+          <div className="canvas-stage__header"><div><span className="eyebrow">{workspaceMode === 'battle' ? 'Battle deployment workspace' : 'Precision board workspace'}</span><span className="board-dimensions">{board.settings.widthInches} × {board.settings.heightInches} in · fixed 1 in grid{workspaceMode === 'battle' ? ' · deployment phase' : ''}</span></div><div className="view-switcher" aria-label="Board view"><Button variant={view === 'overhead' ? 'accent' : 'quiet'} aria-pressed={view === 'overhead'} onClick={() => setView('overhead')}>Overhead</Button><Button variant={view === '3d' ? 'accent' : 'quiet'} aria-pressed={view === '3d'} onClick={() => setView('3d')}>3D planning</Button></div></div>
           <div className="canvas-void">
-            <div className="canvas-shelf" aria-label="Canvas controls"><div className="segmented"><Button variant={mode === 'neutral' ? 'accent' : 'quiet'} aria-pressed={mode === 'neutral'} onClick={() => setMode('neutral')}>Neutral</Button><Button variant={mode === 'select' ? 'accent' : 'quiet'} aria-pressed={mode === 'select'} onClick={() => setMode('select')}><MousePointer2 size={15} />Select</Button><Button variant={mode === 'build' ? 'accent' : 'quiet'} aria-pressed={mode === 'build'} onClick={() => { setMode('build'); setActiveDrawer('build'); }}><Hammer size={15} />Build</Button>{selectedPiece?.structureDetails && <Button variant={mode === 'access' ? 'accent' : 'quiet'} aria-pressed={mode === 'access'} onClick={() => setMode('access')}>Access</Button>}</div><span className="shelf-divider" /><Button variant={board.settings.snap ? 'accent' : 'quiet'} aria-pressed={board.settings.snap} onClick={() => updateSettings({ ...board.settings, snap: !board.settings.snap })}><Grid3X3 size={15} />Snap</Button><Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f' }))}><Maximize2 size={15} />Fit</Button><Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }))} aria-label="Zoom out"><Minus size={15} /></Button><output className="zoom-output" aria-label="Current zoom">1 in</output><Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }))} aria-label="Zoom in"><Plus size={15} /></Button><div className="controls-wrap"><Button variant="quiet" aria-expanded={controlsOpen} onClick={() => setControlsOpen((value) => !value)}><CircleHelp size={15} />Controls</Button><Popover open={controlsOpen} label="Board control reference" onClose={() => setControlsOpen(false)}><strong>Construction controls</strong><p>Build: drag to create · Select: click, Shift-click, or marquee · Move: drag or H/J/K/L · Rotate: R · Pan: middle or Shift-drag · Zoom: wheel.</p></Popover></div></div>
-            {view === 'overhead' ? <OverheadBoard board={board} mode={mode} buildKind={selectedCatalog} selectedIds={selectedIds} hoveredId={hoveredPieceId} onHoverPiece={setHoveredPieceId} onSelectionChange={select} onBuild={addBuild} onMove={move} onResize={resize} onRotate={(id, rotation) => patchPiece({ id, rotation: normalizeRotation(rotation) })} onAccess={addFeature} /> : <Suspense fallback={<p>Loading 3D planning view…</p>}><ThreeBoard board={board} preset={preset} selectedIds={selectedIds} onSelect={(id) => select(id ? [id] : [])} onContextLost={() => { setView('overhead'); announce('3D graphics context was lost. Returned to the overhead editor; your board is unchanged.', 'warning'); }} /></Suspense>}
+            <div className="canvas-shelf" aria-label="Canvas controls">{workspaceMode === 'battle' ? <><div className="segmented"><Button variant="accent" aria-pressed>Deployment</Button><Button variant="quiet" onClick={() => setActiveDrawer('roster')}><Users size={15} />Roster</Button><Button variant="quiet" onClick={() => setActiveDrawer('deploy')}><Crosshair size={15} />Deploy</Button></div><span className="shelf-divider" /></> : <><div className="segmented"><Button variant={mode === 'neutral' ? 'accent' : 'quiet'} aria-pressed={mode === 'neutral'} onClick={() => setMode('neutral')}>Neutral</Button><Button variant={mode === 'select' ? 'accent' : 'quiet'} aria-pressed={mode === 'select'} onClick={() => setMode('select')}><MousePointer2 size={15} />Select</Button><Button variant={mode === 'build' ? 'accent' : 'quiet'} aria-pressed={mode === 'build'} onClick={() => { setMode('build'); setActiveDrawer('build'); }}><Hammer size={15} />Build</Button>{selectedPiece?.structureDetails && <Button variant={mode === 'access' ? 'accent' : 'quiet'} aria-pressed={mode === 'access'} onClick={() => setMode('access')}>Access</Button>}</div><span className="shelf-divider" /><Button variant={board.settings.snap ? 'accent' : 'quiet'} aria-pressed={board.settings.snap} onClick={() => updateSettings({ ...board.settings, snap: !board.settings.snap })}><Grid3X3 size={15} />Snap</Button></>}<Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f' }))}><Maximize2 size={15} />Fit</Button><Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }))} aria-label="Zoom out"><Minus size={15} /></Button><output className="zoom-output" aria-label="Current zoom">1 in</output><Button variant="quiet" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }))} aria-label="Zoom in"><Plus size={15} /></Button><div className="controls-wrap"><Button variant="quiet" aria-expanded={controlsOpen} onClick={() => setControlsOpen((value) => !value)}><CircleHelp size={15} />Controls</Button><Popover open={controlsOpen} label="Board control reference" onClose={() => setControlsOpen(false)}><strong>{workspaceMode === 'battle' ? 'Battle controls' : 'Construction controls'}</strong><p>{workspaceMode === 'battle' ? 'Choose a roster unit, then deploy it through the accessible Deploy drawer. Right-drag or Alt-drag orbits in 3D; middle drag pans and wheel zooms.' : 'Build: drag to create · Select: click, Shift-click, or marquee · Move: drag or H/J/K/L · Rotate: R · Pan: middle or Shift-drag · Zoom: wheel.'}</p></Popover></div></div>
+            {view === 'overhead' ? <OverheadBoard board={board} mode={workspaceMode === 'battle' ? 'neutral' : mode} buildKind={selectedCatalog} selectedIds={selectedIds} hoveredId={hoveredPieceId} onHoverPiece={setHoveredPieceId} onSelectionChange={select} onBuild={addBuild} onMove={move} onResize={resize} onRotate={(id, rotation) => patchPiece({ id, rotation: normalizeRotation(rotation) })} onAccess={addFeature} /> : <Suspense fallback={<p>Loading 3D planning view…</p>}><ThreeBoard board={board} preset={preset} selectedIds={selectedIds} onSelect={(id) => select(id ? [id] : [])} onContextLost={() => { setView('overhead'); announce('3D graphics context was lost. Returned to the overhead editor; your board is unchanged.', 'warning'); }} /></Suspense>}
+            {workspaceMode === 'battle' && battleSession && <div className="battle-board-overlay" aria-label="Battle units and deployment zones">{deploymentZones(battleSession).map((zone) => <div key={zone.id} className="battle-zone" aria-label={zone.label} style={{ left: `${zone.x / board.settings.widthInches * 100}%`, top: `${zone.y / board.settings.heightInches * 100}%`, width: `${zone.width / board.settings.widthInches * 100}%`, height: `${zone.height / board.settings.heightInches * 100}%` }}><span>{zone.label}</span></div>)}{battleSession.objectives.map((objective) => { const source = objective.sourcePieceId ? board.pieces.find((piece) => piece.id === objective.sourcePieceId) : null; return source ? <span key={objective.id} className="battle-objective" style={{ left: `${(source.x + source.width / 2) / board.settings.widthInches * 100}%`, top: `${(source.y + source.height / 2) / board.settings.heightInches * 100}%` }}>◆</span> : null; })}{battleSession.units.filter((unit) => unit.position).map((unit) => <button key={unit.id} type="button" className={`battle-token ${selectedUnitId === unit.id ? 'is-selected' : ''}`} aria-label={`${unit.name}, deployed at ${unit.position!.x}, ${unit.position!.y}`} aria-pressed={selectedUnitId === unit.id} style={{ left: `${(unit.position!.x + .5) / board.settings.widthInches * 100}%`, top: `${(unit.position!.y + .5) / board.settings.heightInches * 100}%` }} onClick={() => { setSelectedUnitId(unit.id); setActiveDrawer(null); }}>{unit.name.slice(0, 1)}</button>)}</div>}
             {view === '3d' && <div className="preset-bar"><Button onClick={() => setPreset('top')}>1 Top</Button><Button onClick={() => setPreset('isometric')}>2 Iso</Button><Button onClick={() => setPreset('perspective')}>3 Perspective</Button><Button onClick={() => setPreset('front')}>4 Front</Button></div>}
             {view === 'overhead' && board.pieces.length === 0 && mode !== 'build' && <div className="zero-state"><div className="zero-state__glyph"><Crosshair size={32} /></div><p className="eyebrow">36 × 36 tactical surface</p><h1>Start building the battlefield.</h1><p>Choose terrain from the catalog, or begin from a balanced starter layout.</p><div className="zero-state__actions"><Button variant="accent" onClick={() => { setMode('build'); setActiveDrawer('build'); }}>Build / add terrain</Button><Button variant="quiet" onClick={() => command(starterBoard(), 'Starter layout loaded into the workspace.', [])}>Load starter layout</Button></div></div>}
           </div>
         </section>
-        <Drawer open={activeDrawer === 'board'} title="Board" onClose={() => setActiveDrawer(null)}><BoardPanel board={board} onHelp={() => setHelpOpen(true)} /></Drawer>
-        <Drawer open={activeDrawer === 'build'} title="Build" onClose={() => setActiveDrawer(null)}><BuildPanel activeKind={selectedCatalog} onChoose={chooseCatalog} onPlace={placeCatalogDefault} /></Drawer>
-        <Drawer open={activeDrawer === 'layers'} title="Layers" onClose={() => setActiveDrawer(null)}><LayersPanel board={board} selectedIds={selectedIds} onSelect={select} onChangePieces={patchMany} onReorder={reorder} /></Drawer>
-        <Drawer open={activeDrawer === 'setup'} title="Setup" onClose={() => setActiveDrawer(null)}><SetupPanel board={board} onSettings={updateSettings} /></Drawer>
-        <InspectorPanel piece={selectedPiece} selectionCount={selectedIds.length} accessType={accessType} onAccessType={(type) => { setAccessType(type); setMode('access'); }} onPatch={patchPiece} onDelete={removeSelected} onDuplicate={duplicate} onJoin={join} joinReason={joinReason} onRemoveAccess={removeFeature} onAddAccess={(type) => { if (!selectedPiece) return; setAccessType(type); addFeature(selectedPiece.id, 'north', Math.max(0, Math.floor(selectedPiece.width / 2) - 1)); }} />
+        {workspaceMode === 'build' && <><Drawer open={activeDrawer === 'board'} title="Board" onClose={() => setActiveDrawer(null)}><BoardPanel board={board} onHelp={() => setHelpOpen(true)} /></Drawer><Drawer open={activeDrawer === 'build'} title="Build" onClose={() => setActiveDrawer(null)}><BuildPanel activeKind={selectedCatalog} onChoose={chooseCatalog} onPlace={placeCatalogDefault} /></Drawer><Drawer open={activeDrawer === 'layers'} title="Layers" onClose={() => setActiveDrawer(null)}><LayersPanel board={board} selectedIds={selectedIds} onSelect={select} onChangePieces={patchMany} onReorder={reorder} /></Drawer><Drawer open={activeDrawer === 'setup'} title="Setup" onClose={() => setActiveDrawer(null)}><SetupPanel board={board} onSettings={updateSettings} /></Drawer><InspectorPanel piece={selectedPiece} selectionCount={selectedIds.length} accessType={accessType} onAccessType={(type) => { setAccessType(type); setMode('access'); }} onPatch={patchPiece} onDelete={removeSelected} onDuplicate={duplicate} onJoin={join} joinReason={joinReason} onRemoveAccess={removeFeature} onAddAccess={(type) => { if (!selectedPiece) return; setAccessType(type); addFeature(selectedPiece.id, 'north', Math.max(0, Math.floor(selectedPiece.width / 2) - 1)); }} /></>}
+        {workspaceMode === 'battle' && battleSession && <><Drawer open={activeDrawer === 'roster'} title="Battle roster" onClose={() => setActiveDrawer(null)}><RosterPanel session={battleSession} selectedUnitId={selectedUnitId} onSelectUnit={(id) => { setSelectedUnitId(id); setActiveDrawer(null); }} onAddFaction={addFaction} onAddUnit={addUnit} /></Drawer><Drawer open={activeDrawer === 'deploy'} title="Deploy units" onClose={() => setActiveDrawer(null)}><DeploymentPanel session={battleSession} selectedUnitId={selectedUnitId} position={deploymentPosition} onPosition={setDeploymentPosition} onDeploy={deploySelected} /></Drawer><BattleInspector session={battleSession} unitId={selectedUnitId} onDeploy={() => setActiveDrawer('deploy')} /></>}
       </main>
     </div>
     <input ref={importInput} className="sr-only" type="file" accept="application/json,.json" aria-label="Import board JSON" onChange={importBoard} />

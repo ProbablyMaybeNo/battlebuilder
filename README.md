@@ -3,12 +3,13 @@
 Battle Builder is a desktop-first tactical board planner. It provides a
 renderer-neutral board document, a precise overhead editor, and a real
 interactive 3D planning view. Phase 2 B13 adds an internal deterministic
-session contract, but the workspace deliberately has no Battle mode,
-unit/deployment UI, rules adapter, combat, turn controls, dice UI, or
-line-of-sight calculation yet.
+session contract and B14 adds a deployment-only Battle mode. Rules adapters,
+combat, turn controls, dice UI, and line-of-sight calculation are still
+intentionally deferred.
 
 Phase 1 is signed off through B12. B13 establishes the simulation engine's
-separate data boundary; B14 and later batches will expose it in the product.
+separate data boundary and B14 exposes a deployment-only Battle mode; rules
+resolution and battle interaction remain later batches.
 The Phase 1 acceptance record is in
 [`ux-audit/PHASE_1_SIGNOFF.md`](ux-audit/PHASE_1_SIGNOFF.md).
 
@@ -77,7 +78,18 @@ objectives, turn state, command replay metadata, and typed event history.
 It persists only under `battle-builder/v1/session/draft`; it cannot overwrite
 the planner draft. Session imports are structurally validated and replayed
 before acceptance, so invalid or inconsistent files preserve the active safe
-session. This is an engine boundary only; no Battle-mode UI ships yet.
+session.
+
+## Battle deployment mode
+
+**Enter Battle** safely saves the active board and either restores a matching
+session snapshot or creates a new deterministic deployment session. Battle
+mode has its own roster and deployment drawers, unit cards, faction zones, and
+generic bounds/occupancy/blocking-terrain validation. Unit and objective
+markers remain visible in overhead and 3D. **Return to Build** leaves the
+planner unchanged and retains the session draft. Combat, movement resolution,
+rules adapters, roll UI, and turn interaction are intentionally not available
+yet.
 
 ## Controls
 

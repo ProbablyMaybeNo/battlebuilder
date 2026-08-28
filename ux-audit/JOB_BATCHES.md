@@ -35,7 +35,7 @@ simulation foundation; later batches remain gated by their direct dependencies.
 | B11 | Performance, release hygiene, and GitHub delivery | B10 | Complete |
 | B12 | Manual sign-off and Phase 2 readiness gate | B11 | Complete |
 | B13 | Simulation contracts and deterministic event engine | B12 | Complete |
-| B14 | Battle mode, factions, units, and deployment | B13 | Not started |
+| B14 | Battle mode, factions, units, and deployment | B13 | Complete |
 | B15 | Rules-adapter framework and tactical resolution | B13, B14 | Not started |
 | B16 | Battle interaction, explanations, replay, and logs | B14, B15 | Not started |
 | B17 | Simulation accessibility, test evidence, and release hygiene | B13–B16 | Not started |

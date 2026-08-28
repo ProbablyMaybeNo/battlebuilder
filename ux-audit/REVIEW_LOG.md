@@ -241,3 +241,24 @@ B03 own the first visible workspace and board review.
   `pnpm test:e2e` (37 isolated Chromium tests). The initial route remains
   277.8 KiB / 350 KiB; the lazy 3D chunk remains 516.4 KiB / 700 KiB. B13 adds
   no Battle mode UI, deployment UX, rules adapter, combat, or simulator view.
+
+## B14 — battle mode, roster, and deployment (2026-08-28)
+
+- Added an explicit Battle-mode transition that locally saves the active board
+  first, then restores only a matching session snapshot or creates a fresh
+  deterministic deployment session. Returning to Build mode preserves both
+  the untouched planner and the session draft.
+- Battle mode replaces planner-only rail/drawers with accessible Roster and
+  Deploy surfaces. It includes factions, unit-template cards, unit cards,
+  objective markers, selection inspector, faction deployment zones, and
+  generic board-boundary, zone, occupancy, and blocking-terrain feedback.
+  Rules-specific calculations, attacks, movement resolution, dice UI, turns,
+  logs, and adapters remain deferred to B15/B16.
+- Units/objectives are visible and selectable in the shared overhead and 3D
+  board presentations. B14 visual captures at both target desktop sizes are
+  `screenshots/b14-battle-overhead-1440x960.png` and
+  `screenshots/b14-battle-overhead-1920x1080.png`.
+- Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (38),
+  `pnpm build`, `pnpm audit`, `pnpm bundle:check`, `pnpm release:hygiene`, and
+  `pnpm test:e2e` (41 isolated Chromium tests). Initial bundle size is
+  305.5 KiB / 350 KiB; the lazy 3D chunk remains 516.4 KiB / 700 KiB.

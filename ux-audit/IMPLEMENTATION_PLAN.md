@@ -262,7 +262,9 @@ UI and rules behavior remain gated behind their later batches.
 - [x] Define versioned battle/session documents separate from board documents,
   with an immutable board snapshot/terrain bridge, recovery-safe persistence,
   deterministic PRNG state, typed commands/events, and replay validation.
-- [ ] Add factions, deployable units, deployment state, objectives, turn/phase sequence, and battle mode isolated from Build mode.
+- [x] Add an isolated Battle deployment mode with factions, roster templates,
+  unit cards, objectives, board snapshot safeguards, generic deployment zones,
+  and non-destructive Build return. Tactical/rules calculations remain deferred.
 - [ ] Create game-system adapters for terrain effects, movement, range, cover, LOS, and future game-specific rules.
 - [ ] Add calculation explanations and Battle-mode roll/replay presentation over the deterministic seeded engine.
 - [ ] Add event log, accessible result summaries, simulation tests, and replay snapshots.

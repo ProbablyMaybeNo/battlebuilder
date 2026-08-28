@@ -10,6 +10,15 @@ _No active defects recorded._
 
 ## Completed
 
+- **B14-001 — The deterministic session core had no discoverable setup flow,
+  leaving factions, units, deployment, and session/board boundaries
+  untestable in the product.** Added an explicit save-safe Build/Battle
+  transition, Battle-only roster/deployment drawers and inspector, generic
+  faction zones, roster cards/templates, bounds/occupancy/blocking-terrain
+  deployment feedback, session restoration, and overhead/3D battle overlays.
+  Verified with focused deployment unit tests, isolated browser flows,
+  storage-key checks, keyboard-accessible controls, and B14 desktop captures.
+
 - **B13-001 — The signed-off planner had no isolated, deterministic simulation
   contract, leaving future battle work at risk of modifying `BoardDocument` or
   planner storage.** Added the versioned `BattleSession` boundary, immutable
