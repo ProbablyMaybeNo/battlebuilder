@@ -33,6 +33,12 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | B10 | Automated tests, visual regression, and audit assets | B01–B09 | Complete |
 | B11 | Performance, release hygiene, and GitHub delivery | B10 | Complete |
 | B12 | Manual sign-off and Phase 2 readiness gate | B11 | Complete |
+| B13 | Simulation contracts and deterministic event engine | B12 | Not started |
+| B14 | Battle mode, factions, units, and deployment | B13 | Not started |
+| B15 | Rules-adapter framework and tactical resolution | B13, B14 | Not started |
+| B16 | Battle interaction, explanations, replay, and logs | B14, B15 | Not started |
+| B17 | Simulation accessibility, test evidence, and release hygiene | B13–B16 | Not started |
+| B18 | Phase 2 sign-off and future-rules readiness gate | B17 | Not started |
 
 ---
 
@@ -323,3 +329,118 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 
 - The sign-off document records a genuine visual and functional pass, with all acceptance criteria met.
 - The team may then create the Phase 2 simulator batch plan; no simulator code is part of this completion.
+
+---
+
+# Phase 2 — Tactical simulation batches
+
+## B13 — Simulation contracts and deterministic event engine
+
+**Goal:** Establish a simulation data model and deterministic engine that consume the signed-off board document without changing or polluting planner state.
+
+### Work
+
+- Define a versioned `BattleSession` document separate from `BoardDocument`, with board reference/snapshot, seed, adapter identifier/version, factions, units, objectives, turn state, event history, and replay metadata.
+- Create a deterministic pseudorandom source with explicit seed, serializable state, bounded roll API, and reproducible replay tests.
+- Implement typed simulation events/commands and a pure reducer: session create, deploy, phase change, move intent, roll request/result, objective state, and log entries.
+- Implement strict runtime validation, migration registry, import/export, local persistence, and non-destructive recovery for battle sessions.
+- Define the immutable bridge from board pieces to simulation terrain facts; never add simulator-only fields to the Phase 1 board document.
+- Add unit tests for seed replay, event determinism, validation, migration, persistence isolation, and board-to-session conversion.
+
+### Completion gate
+
+- Replaying the same commands with the same seed yields identical state and event history.
+- Board editing and battle session persistence remain completely separate and safe.
+
+---
+
+## B14 — Battle mode, factions, units, and deployment
+
+**Goal:** Add a separate, discoverable Battle mode that loads board data without cluttering the finished editor.
+
+### Work
+
+- Add an explicit mode transition between Build and Battle, with unsaved-state safeguards and clear visual mode identity.
+- Implement factions, unit templates, unit instances, unit cards, roster management, and accessible faction/unit selection.
+- Implement deployment zones and a deployment phase with board bounds, occupancy, terrain, and adapter validation feedback.
+- Render units and objectives in both overhead and 3D views, with selection, visibility, labels, layer discovery, and a non-destructive return to Build mode.
+- Add battle-specific drawers/inspector only within Battle mode; retain Phase 1’s compact UI and avoid duplicate controls.
+- Test deployment, mode switching, persistence, keyboard control, and browser-state isolation.
+
+### Completion gate
+
+- A user can set up a deterministic battle session from a saved board, add factions/units, deploy legally, and return to the untouched planner.
+
+---
+
+## B15 — Rules-adapter framework and tactical resolution
+
+**Goal:** Implement understandable, testable tactical calculations while keeping game-specific rules pluggable.
+
+### Work
+
+- Define the rules-adapter interface for unit profiles, phases, legal actions, movement, range, terrain effects, cover, line of sight, objective scoring, and roll resolution.
+- Implement a documented generic skirmish adapter for end-to-end testing; do not imply it is a licensed third-party ruleset.
+- Build pure spatial helpers for grid movement/range, terrain occupancy, line-of-sight ray checks, intervening cover, elevation hooks, and legal-target determination.
+- Route every calculation through adapter-provided explanations that identify inputs, assumptions, terrain contributions, rolls, and outcome.
+- Unit-test edge cases for blocked movement, cover, line of sight, range, objectives, invalid actions, and deterministic rolls.
+
+### Completion gate
+
+- Every displayed tactical result is deterministic, adapter-owned, inspectable, and accompanied by a human-readable explanation.
+
+---
+
+## B16 — Battle interaction, explanations, replay, and logs
+
+**Goal:** Turn deterministic state and rules into a calm, usable tactical command experience.
+
+### Work
+
+- Implement turn/phase progression, action selection, movement previews, target/range/LOS overlays, cover feedback, objective interactions, and explicit action confirmation.
+- Build an event log and roll history with filters, meaningful event summaries, calculation detail, copyable seed, and replay controls.
+- Implement session playback/scrubbing from a seed and command history; distinguish replay/read-only state from live play.
+- Add clear conflict, invalid-action, and recovery states; no unexplained disabled controls or hidden calculation outcomes.
+- Synchronize battle state across overhead and 3D views without introducing camera or selection regressions.
+- Add browser/integration coverage for a full deterministic scenario, replay, error recovery, and reduced-motion operation.
+
+### Completion gate
+
+- A full generic skirmish scenario can be played, understood, replayed from its seed, and audited through its event log.
+
+---
+
+## B17 — Simulation accessibility, evidence, and release hygiene
+
+**Goal:** Prove that Battle mode is accessible, performant, deterministic, and production-ready.
+
+### Work
+
+- Complete keyboard and assistive-technology paths for mode switching, deployment, turn/phase control, action selection, log navigation, replay, and tactical overlays.
+- Run axe checks across all Battle mode states; ensure colour is never the only signal for faction, target, invalid, cover, range, or phase state.
+- Profile populated planner-plus-battle sessions at 36×36 and 72×72 in both renderers; remediate real performance issues and maintain bundle budgets.
+- Add isolated Playwright regression/evidence suite and 1440×960/1920×1080 captures for deployment, active turn, target/LOS/cover, roll explanation, log/replay, invalid action, and Battle-to-Build return.
+- Run lint, strict typecheck, unit/integration/E2E/axe, production build, audit, bundle budget, and production-preview recovery checks.
+- Update README, adapter documentation, backlog, and review log.
+
+### Completion gate
+
+- All simulation checks pass in isolated storage; required visual evidence exists at both desktop resolutions; no active backlog issue remains.
+
+---
+
+## B18 — Phase 2 sign-off and future-rules readiness gate
+
+**Goal:** Make an evidence-based decision that the generic simulation layer is complete and safe for additional rules systems.
+
+### Work
+
+- Perform a full desktop review of Build-to-Battle transition, deployment, generic scenario play, deterministic replay, logs, invalid actions, and Build return at both target resolutions.
+- Verify identical outcomes for repeated seed/command histories and document the replay verification.
+- Confirm board documents remain compatible and independent; verify new adapters can be added without modifying planner or engine internals.
+- Reconcile screenshots, test results, performance measurements, documentation, and backlog.
+- Create `ux-audit/PHASE_2_SIGNOFF.md` with pass/fail evidence and adapter-extension guidance. Do not sign off with any acceptance failure or active defect.
+
+### Completion gate
+
+- The generic simulation platform is signed off, reproducible, accessible, and ready for game-specific adapter work.
