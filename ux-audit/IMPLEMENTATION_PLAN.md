@@ -256,12 +256,15 @@ Manual sign-off covers mouse, keyboard, pointer cancellation, direct resize/rota
 
 ### Phase 2 — Tactical simulator (gated)
 
-Do not begin until Phase 1E passes.
+Phase 1E passed at B12. B13 establishes the engine boundary only; Battle-mode
+UI and rules behavior remain gated behind their later batches.
 
-- [ ] Define battle/session documents separate from board documents.
+- [x] Define versioned battle/session documents separate from board documents,
+  with an immutable board snapshot/terrain bridge, recovery-safe persistence,
+  deterministic PRNG state, typed commands/events, and replay validation.
 - [ ] Add factions, deployable units, deployment state, objectives, turn/phase sequence, and battle mode isolated from Build mode.
 - [ ] Create game-system adapters for terrain effects, movement, range, cover, LOS, and future game-specific rules.
-- [ ] Implement deterministic seeded dice/rolls, transparent calculation explanations, roll history, and replay.
+- [ ] Add calculation explanations and Battle-mode roll/replay presentation over the deterministic seeded engine.
 - [ ] Add event log, accessible result summaries, simulation tests, and replay snapshots.
 
 ## Definition of Phase 1 done

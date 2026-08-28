@@ -221,3 +221,23 @@ B03 own the first visible workspace and board review.
   neutral and that no Phase 2 rules, units, turns, combat, or replay UX exists
   in production source. The sign-off decision and evidence matrix are in
   [PHASE_1_SIGNOFF.md](PHASE_1_SIGNOFF.md).
+
+## B13 — simulation contracts and deterministic event engine (2026-08-28)
+
+- Added an isolated, versioned `BattleSession` model with a validated board
+  reference/snapshot, immutable terrain facts, adapter reference, factions,
+  units, objectives, turn state, typed event history, and replay metadata.
+  `BoardDocument`, renderer contracts, planner persistence, and workspace UI
+  were not changed.
+- The pure reducer handles session creation, unit deployment, phase changes,
+  move intent, seeded bounded roll request/result, objective state, and log
+  entries. It uses no clock or ambient randomness; replaying the serialized
+  creation command and command sequence reproduces state and events exactly.
+- Session imports/exports and recoverable local drafts validate both the
+  runtime schema and replay integrity. Session storage uses only
+  `battle-builder/v1/session/draft`, leaving the planner draft untouched.
+- Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (36),
+  `pnpm build`, `pnpm audit`, `pnpm bundle:check`, `pnpm release:hygiene`, and
+  `pnpm test:e2e` (37 isolated Chromium tests). The initial route remains
+  277.8 KiB / 350 KiB; the lazy 3D chunk remains 516.4 KiB / 700 KiB. B13 adds
+  no Battle mode UI, deployment UX, rules adapter, combat, or simulator view.

@@ -10,6 +10,15 @@ _No active defects recorded._
 
 ## Completed
 
+- **B13-001 — The signed-off planner had no isolated, deterministic simulation
+  contract, leaving future battle work at risk of modifying `BoardDocument` or
+  planner storage.** Added the versioned `BattleSession` boundary, immutable
+  board snapshot/terrain-fact bridge, seed/state PRNG, typed pure command
+  reducer, replay verification, migrations, strict session validation, and a
+  separate recoverable `battle-builder/v1/session/draft` namespace. Verified
+  by seed/replay, validation, migration, persistence-isolation, and
+  board-to-session unit coverage; planner browser regressions remain green.
+
 - **B11-001 — The 3D renderer recreated a WebGL scene for selection/preset
   updates and continued rendering when the board was idle.** Retained the scene
   across selection/preset updates, reused matching geometry/materials within a

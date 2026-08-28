@@ -1,10 +1,11 @@
-# Battle Builder — Phase 1 job batches
+# Battle Builder — delivery job batches
 
 ## Mission
 
 Build a desktop-first tactical board planner that is fully complete, quality-verified, and safe to become the spatial foundation for Phase 2 simulation. It must support precision overhead editing and an interactive 3D planning view from one shared board document.
 
-Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, combat, and game-specific rules—are out of scope for every batch below.
+Phase 1 mechanics end at B12. B13 begins the deliberately separate Phase 2
+simulation foundation; later batches remain gated by their direct dependencies.
 
 ## Agent execution protocol
 
@@ -14,7 +15,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 4. Implement the entire batch, run its verification commands, perform its stated visual/interaction review, then update the batch status and `BACKLOG.md` before handing off.
 5. Log every found defect, missing capability, visual issue, performance issue, or usability improvement in `BACKLOG.md`. Complete it before calling the active batch finished, unless it is explicitly deferred as a Phase 2 item.
 6. Preserve user data: browser automation must use a dedicated isolated storage context. Never overwrite the real local draft while testing.
-7. Do not begin a later batch when the current batch’s completion gate is unmet. Do not begin Phase 2.
+7. Do not begin a later batch when the current batch’s completion gate is unmet.
 
 ## Batch status
 
@@ -33,7 +34,7 @@ Phase 2 mechanics—units, deployment, turns, dice, ranges, line of sight, comba
 | B10 | Automated tests, visual regression, and audit assets | B01–B09 | Complete |
 | B11 | Performance, release hygiene, and GitHub delivery | B10 | Complete |
 | B12 | Manual sign-off and Phase 2 readiness gate | B11 | Complete |
-| B13 | Simulation contracts and deterministic event engine | B12 | Not started |
+| B13 | Simulation contracts and deterministic event engine | B12 | Complete |
 | B14 | Battle mode, factions, units, and deployment | B13 | Not started |
 | B15 | Rules-adapter framework and tactical resolution | B13, B14 | Not started |
 | B16 | Battle interaction, explanations, replay, and logs | B14, B15 | Not started |

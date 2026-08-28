@@ -2,12 +2,14 @@
 
 Battle Builder is a desktop-first tactical board planner. It provides a
 renderer-neutral board document, a precise overhead editor, and a real
-interactive 3D planning view. It deliberately does **not** contain game rules,
-units, combat, turns, dice, line-of-sight calculations, or simulation; those
-belong to Phase 2 after the Phase 1 readiness gate.
+interactive 3D planning view. Phase 2 B13 adds an internal deterministic
+session contract, but the workspace deliberately has no Battle mode,
+unit/deployment UI, rules adapter, combat, turn controls, dice UI, or
+line-of-sight calculation yet.
 
-Phase 1 is signed off through B12 and is ready to serve as the spatial
-foundation for a separately planned simulator. The acceptance record is in
+Phase 1 is signed off through B12. B13 establishes the simulation engine's
+separate data boundary; B14 and later batches will expose it in the product.
+The Phase 1 acceptance record is in
 [`ux-audit/PHASE_1_SIGNOFF.md`](ux-audit/PHASE_1_SIGNOFF.md).
 
 New boards are 36 × 36 inches. Every cell is permanently one inch, with a
@@ -65,6 +67,17 @@ saved boards have a separate local index. This storage is local to the browser,
 so JSON export is the portable backup/share format. Version 1 compatibility is
 maintained through the document migration registry; future formats must migrate
 before validation rather than relying on renderer-specific fields.
+
+## Simulation session foundation
+
+The internal B13 `BattleSession` contract is versioned separately from
+`BoardDocument`. It stores its own validated board snapshot, derived terrain
+facts, deterministic seed/random state, adapter reference, factions, units,
+objectives, turn state, command replay metadata, and typed event history.
+It persists only under `battle-builder/v1/session/draft`; it cannot overwrite
+the planner draft. Session imports are structurally validated and replayed
+before acceptance, so invalid or inconsistent files preserve the active safe
+session. This is an engine boundary only; no Battle-mode UI ships yet.
 
 ## Controls
 
