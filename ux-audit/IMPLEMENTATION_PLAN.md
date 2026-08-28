@@ -252,7 +252,7 @@ Manual sign-off covers mouse, keyboard, pointer cancellation, direct resize/rota
 - [x] Add 3D interaction/performance tests and visual captures for isometric and perspective planning views.
 - [x] Run lint, typecheck, unit/integration/E2E/axe, production build, audit, and bundle check.
 - [x] Fix every discovered issue, record it in `ux-audit/BACKLOG.md`, complete it, and record resolution.
-- [ ] Conduct final desktop visual review at both required resolutions. Phase 1 cannot be marked complete until this sign-off is recorded.
+- [x] Conduct final desktop visual review at both required resolutions. Phase 1 sign-off is recorded in `ux-audit/PHASE_1_SIGNOFF.md`.
 
 ### Phase 2 — Tactical simulator (gated)
 

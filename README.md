@@ -6,6 +6,10 @@ interactive 3D planning view. It deliberately does **not** contain game rules,
 units, combat, turns, dice, line-of-sight calculations, or simulation; those
 belong to Phase 2 after the Phase 1 readiness gate.
 
+Phase 1 is signed off through B12 and is ready to serve as the spatial
+foundation for a separately planned simulator. The acceptance record is in
+[`ux-audit/PHASE_1_SIGNOFF.md`](ux-audit/PHASE_1_SIGNOFF.md).
+
 New boards are 36 × 36 inches. Every cell is permanently one inch, with a
 visible line at every inch and a stronger reference line at each 12-inch
 multiple. Boards can be configured from 12 × 12 up to 72 × 72 inches.

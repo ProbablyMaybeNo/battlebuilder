@@ -2,9 +2,10 @@
 
 ## Status
 
-Visual and manual interaction evidence is complete through B10. Required
-evidence and results are recorded in [VISUAL_REVIEW.md](VISUAL_REVIEW.md) and
-[MANUAL_INTERACTION_CHECKLIST.md](MANUAL_INTERACTION_CHECKLIST.md).
+Phase 1 is signed off through B12. Required evidence and results are recorded
+in [VISUAL_REVIEW.md](VISUAL_REVIEW.md),
+[MANUAL_INTERACTION_CHECKLIST.md](MANUAL_INTERACTION_CHECKLIST.md), and
+[PHASE_1_SIGNOFF.md](PHASE_1_SIGNOFF.md).
 
 ## B00 — project baseline verification (2026-08-26)
 
@@ -205,3 +206,18 @@ B03 own the first visible workspace and board review.
   camera/input controls, accessibility, browser support, and WebGL fallback.
   Canonical screenshots remain under `ux-audit/screenshots/`; regular evidence
   test runs use isolated output to avoid transient Windows screenshot locks.
+
+## B12 — Phase 1 readiness sign-off (2026-08-28)
+
+- Replayed the documented desktop planner paths at 1440×960 and 1920×1080:
+  board/grid, overhead and 3D camera controls, construction, selection,
+  transforms, Access, layers, Setup, inspector, lifecycle/recovery, keyboard,
+  focus, and visual evidence states. No acceptance item failed.
+- Added a final isolated readiness replay covering exact 36×36 and 72×72
+  grid-line counts, safe maximum-size configuration, real mouse orbit/pan,
+  wheel/keyboard camera controls, presets, and clean page-error state at both
+  desktop targets.
+- Confirmed `BoardDocument` and the shared geometry service are renderer
+  neutral and that no Phase 2 rules, units, turns, combat, or replay UX exists
+  in production source. The sign-off decision and evidence matrix are in
+  [PHASE_1_SIGNOFF.md](PHASE_1_SIGNOFF.md).

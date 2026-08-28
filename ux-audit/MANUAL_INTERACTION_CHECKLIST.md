@@ -1,6 +1,6 @@
 # Phase 1 manual interaction checklist
 
-Recorded 2026-08-26. The checklist was replayed in the isolated Chromium
+Recorded 2026-08-28. The checklist was replayed in the isolated Chromium
 profile at 1440 × 960 and 1920 × 1080; browser state is isolated through
 `e2e/fixtures.ts`. Related automated evidence is named where it is the most
 precise repeatable record.
