@@ -31,6 +31,12 @@ const chunks = await Promise.all(Object.values(manifest).map(async (item) => ({
 const largestLazyChunk = chunks
   .filter((chunk) => !entryFiles.has(chunk.file))
   .sort((left, right) => right.bytes - left.bytes)[0];
+const threeEntry = manifest['src/renderer/three-board.tsx'];
+if (!threeEntry?.isDynamicEntry || entryFiles.has(threeEntry.file)) {
+  throw new Error('The 3D renderer must remain a separate lazy production chunk.');
+}
+const threeChunk = chunks.find((chunk) => chunk.file === threeEntry.file);
+if (!threeChunk) throw new Error('The lazy 3D renderer chunk is missing from the production manifest.');
 
 if (entryBytes > entryLimitBytes) {
   throw new Error(`Initial route is ${(entryBytes / 1024).toFixed(1)} KiB; limit is ${entryLimitBytes / 1024} KiB.`);
@@ -43,3 +49,4 @@ console.log(`Initial route: ${(entryBytes / 1024).toFixed(1)} KiB / ${entryLimit
 console.log(largestLazyChunk
   ? `Largest lazy chunk: ${(largestLazyChunk.bytes / 1024).toFixed(1)} KiB / ${lazyChunkLimitBytes / 1024} KiB (${largestLazyChunk.file})`
   : 'Largest lazy chunk: none');
+console.log(`3D renderer chunk: ${(threeChunk.bytes / 1024).toFixed(1)} KiB (${threeChunk.file})`);

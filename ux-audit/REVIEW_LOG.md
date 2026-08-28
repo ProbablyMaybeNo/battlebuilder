@@ -178,3 +178,30 @@ B03 own the first visible workspace and board review.
   unit tests), `pnpm test:e2e` (33 isolated Chromium checks), `pnpm build`,
   `pnpm audit`, and `pnpm bundle:check` (277.6 KiB initial / 350 KiB;
   514.7 KiB lazy 3D / 700 KiB).
+
+## B11 — performance, release hygiene, and delivery verification (2026-08-28)
+
+- Remediated the actual 3D renderer lifecycle issue: selection and preset
+  changes no longer recreate the scene, matching geometry/materials are reused
+  for the current board, and rendering is requested only after a visible
+  change. The lazy renderer remains isolated from the overhead entry route.
+- Isolated Chromium profile coverage passed for populated boards in both
+  renderers: 36×36 with 72 pieces observed 312 ms overhead / 598 ms 3D, and
+  72×72 with 288 pieces observed 444 ms overhead / 613 ms 3D. Conservative
+  regression limits are 5 s overhead and 8 s 3D. Production preview observed
+  78 ms / 465 ms and 103 ms / 461 ms respectively.
+- Production-preview lifecycle verification passed all six focused Chromium
+  flows: Save/Rename/Duplicate/Open/Export, valid/malformed import recovery,
+  destructive undo, both profile boards, lazy 3D, presets, and context-loss
+  return to overhead. The board remains unchanged during the fallback.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (28), `pnpm test:e2e` (35),
+  `pnpm build`, `pnpm audit`, `pnpm bundle:check`, and `pnpm release:hygiene`
+  passed. The entry route is 277.8 KiB / 350 KiB; the explicitly lazy 3D chunk
+  is 516.4 KiB / 700 KiB. The production audit reports no known
+  vulnerabilities. The hygiene script confirms the small allowlisted
+  production dependency set, no R3F, lazy-only Three.js import, and no remote
+  fonts/assets.
+- README now covers purpose, setup, scripts, document compatibility, storage,
+  camera/input controls, accessibility, browser support, and WebGL fallback.
+  Canonical screenshots remain under `ux-audit/screenshots/`; regular evidence
+  test runs use isolated output to avoid transient Windows screenshot locks.

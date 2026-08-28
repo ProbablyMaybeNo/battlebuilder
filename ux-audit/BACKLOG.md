@@ -10,6 +10,28 @@ _No active defects recorded._
 
 ## Completed
 
+- **B11-001 — The 3D renderer recreated a WebGL scene for selection/preset
+  updates and continued rendering when the board was idle.** Retained the scene
+  across selection/preset updates, reused matching geometry/materials within a
+  board scene, and switched to render-on-demand. Added 36×36/72×72 populated
+  renderer profile coverage (72 and 288 pieces respectively), with conservative
+  time budgets. Chromium observed 312 ms overhead / 598 ms 3D on 36×36 and
+  444 ms overhead / 613 ms 3D on 72×72; production-preview checks were faster.
+- **B11-002 — A lost WebGL context only left an inactive canvas, and the empty
+  state could intercept its recovery controls.** Added an accessible in-place
+  graphics-loss message with a safe return to overhead, and limited the empty
+  state overlay to the overhead view. Verified in the production preview.
+- **B11-003 — Routine parallel evidence tests wrote directly into canonical
+  screenshots and could intermittently collide with a Windows file lock.**
+  Ordinary runs now write stable captures to isolated Playwright output; the
+  existing canonical evidence is refreshed only with the explicit
+  `UPDATE_VISUAL_EVIDENCE` environment flag. Full 35-test Chromium suite
+  passes without mutating review evidence.
+- **B11-004 — Release constraints were documented but not mechanically guarded
+  beyond a broad chunk-size report.** Added the lazy-3D manifest assertion and
+  a release-hygiene script covering the production dependency allowlist, no
+  R3F, the lazy Three.js boundary, and no remote font/asset references.
+
 - **B10-001 — Phase 1 evidence was split across batch-specific captures and
   could not show the complete target-size review set in one location.** Added
   an isolated visual-evidence suite that produces all twenty required

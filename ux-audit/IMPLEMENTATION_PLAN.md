@@ -228,30 +228,30 @@ Manual sign-off covers mouse, keyboard, pointer cancellation, direct resize/rota
 
 ### Phase 1B — Board-first workspace and visual system
 
-- [ ] Implement the app shell, slim document bar, 64 px activity rail, compact canvas shelf, SVG board, rulers, grid, surface variants, and zero state.
-- [ ] Implement the immutable one-inch board grid (maximum 72×72 cells), major 12-inch lines, dimensions/rulers, and canvas coordinate feedback in both views.
-- [ ] Implement the renderer-neutral geometry service, view switching, lazy 3D planning renderer, documented camera bindings, camera presets/orbit/pan/zoom, and overhead/3D selection synchronization.
-- [ ] Implement data-driven tactical object symbols, quiet collision-aware labels, hover/selection/invalid/locked/hidden states.
-- [ ] Validate visual direction against supplied references without copied visuals/assets.
+- [x] Implement the app shell, slim document bar, 64 px activity rail, compact canvas shelf, SVG board, rulers, grid, surface variants, and zero state.
+- [x] Implement the immutable one-inch board grid (maximum 72×72 cells), major 12-inch lines, dimensions/rulers, and canvas coordinate feedback in both views.
+- [x] Implement the renderer-neutral geometry service, view switching, lazy 3D planning renderer, documented camera bindings, camera presets/orbit/pan/zoom, and overhead/3D selection synchronization.
+- [x] Implement data-driven tactical object symbols, quiet collision-aware labels, hover/selection/invalid/locked/hidden states.
+- [x] Validate visual direction against supplied references without copied visuals/assets.
 
 ### Phase 1C — Planner interactions
 
-- [ ] Implement drag-to-size construction, placement, selection, multi-select, marquee, pointer-safe drag, snap, collision, bounds, alignment, keyboard movement, direct resize, rotation, duplication, deletion, and structure join.
-- [ ] Implement structure footprints, exterior-wall validation, doors/windows, direct Access editing, and 3D equivalents.
-- [ ] Implement pan/zoom/fit/reset and all defined feedback states.
-- [ ] Add activity drawers, searchable grouped library, recents/favourites, layers reorder/visibility/locking/search, and type-aware inspector.
+- [x] Implement drag-to-size construction, placement, selection, multi-select, marquee, pointer-safe drag, snap, collision, bounds, alignment, keyboard movement, direct resize, rotation, duplication, deletion, and structure join.
+- [x] Implement structure footprints, exterior-wall validation, doors/windows, direct Access editing, and 3D equivalents.
+- [x] Implement pan/zoom/fit/reset and all defined feedback states.
+- [x] Add activity drawers, searchable grouped library, recents/favourites, layers reorder/visibility/locking/search, and type-aware inspector.
 
 ### Phase 1D — Lifecycle and accessibility completion
 
-- [ ] Complete Board menu, board naming, new/duplicate/open/clear/import/export, confirmation dialogs, save status, undo/redo coverage, and focus/live-announcement behavior.
-- [ ] Test all keyboard, pointer, dialog, and recovery flows manually and automatically.
+- [x] Complete Board menu, board naming, new/duplicate/open/clear/import/export, confirmation dialogs, save status, undo/redo coverage, and focus/live-announcement behavior.
+- [x] Test all keyboard, pointer, dialog, and recovery flows manually and automatically.
 
 ### Phase 1E — Verification and sign-off
 
-- [ ] Add browser/axe specs and all required visual screenshot captures.
-- [ ] Add 3D interaction/performance tests and visual captures for isometric and perspective planning views.
-- [ ] Run lint, typecheck, unit/integration/E2E/axe, production build, audit, and bundle check.
-- [ ] Fix every discovered issue, record it in `ux-audit/BACKLOG.md`, complete it, and record resolution.
+- [x] Add browser/axe specs and all required visual screenshot captures.
+- [x] Add 3D interaction/performance tests and visual captures for isometric and perspective planning views.
+- [x] Run lint, typecheck, unit/integration/E2E/axe, production build, audit, and bundle check.
+- [x] Fix every discovered issue, record it in `ux-audit/BACKLOG.md`, complete it, and record resolution.
 - [ ] Conduct final desktop visual review at both required resolutions. Phase 1 cannot be marked complete until this sign-off is recorded.
 
 ### Phase 2 — Tactical simulator (gated)

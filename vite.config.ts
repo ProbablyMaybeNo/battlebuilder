@@ -7,7 +7,10 @@ export default defineConfig({
   build: {
     manifest: true,
     sourcemap: true,
-    chunkSizeWarningLimit: 350,
+    // The app route is held to 350 KiB by scripts/check-bundle.mjs. The lazy
+    // Three.js renderer has its own 700 KiB budget, so Vite should not warn on
+    // that intentional deferred chunk.
+    chunkSizeWarningLimit: 700,
   },
   test: {
     environment: 'node',

@@ -20,3 +20,8 @@ invalid-placement--overhead--1440x960.png
 Allowed scenario names are the review states listed in B10. Use `overhead`,
 `isometric-3d`, or `perspective-3d` for `view`, and capture each required state
 at both 1440x960 and 1920x1080.
+
+The evidence test writes to its isolated Playwright output directory during
+ordinary verification. Refresh the committed canonical set deliberately by
+setting `UPDATE_VISUAL_EVIDENCE=1` before `pnpm test:e2e`; this avoids transient
+Windows file locks on review artifacts during routine parallel test runs.

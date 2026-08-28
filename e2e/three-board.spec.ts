@@ -12,6 +12,7 @@ test('lazy loads the 3D board, accepts presets, and handles context loss', async
   await expect(page.getByRole('button', { name: '4 Front' })).toBeVisible();
   await board.locator('canvas').dispatchEvent('webglcontextlost');
   await expect(board).toHaveAttribute('data-context-lost', 'true');
-  await page.keyboard.press('1');
+  await expect(board.getByRole('alert')).toContainText('3D graphics paused');
+  await board.getByRole('button', { name: 'Return to overhead' }).click();
   await expect(page.getByRole('application', { name: '36 by 36 inch overhead board' })).toBeVisible();
 });
