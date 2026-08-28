@@ -10,6 +10,16 @@ _No active defects recorded._
 
 ## Completed
 
+- **B15-001 — Battle sessions had no pluggable, inspectable tactical-rules
+  boundary, so movement, range, terrain, cover, LOS, objectives, and rolls
+  risked becoming opaque UI logic or polluting the board model.** Added the
+  versioned `RulesAdapter` contract, pure deterministic grid/spatial helpers,
+  an original `battle-builder-generic@1` reference adapter, adapter-owned
+  explanations, extension documentation, and edge-case tests. Verified with
+  strict checks, 47 unit tests, full isolated browser regression coverage,
+  production build, audit, bundle budget, and release hygiene. B16 remains
+  responsible only for presenting these already-explained results in Battle UI.
+
 - **B14-001 — The deterministic session core had no discoverable setup flow,
   leaving factions, units, deployment, and session/board boundaries
   untestable in the product.** Added an explicit save-safe Build/Battle

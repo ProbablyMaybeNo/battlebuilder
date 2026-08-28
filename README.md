@@ -3,13 +3,14 @@
 Battle Builder is a desktop-first tactical board planner. It provides a
 renderer-neutral board document, a precise overhead editor, and a real
 interactive 3D planning view. Phase 2 B13 adds an internal deterministic
-session contract and B14 adds a deployment-only Battle mode. Rules adapters,
-combat, turn controls, dice UI, and line-of-sight calculation are still
-intentionally deferred.
+session contract, B14 adds a deployment-only Battle mode, and B15 adds a
+tested rules-adapter boundary plus an original generic skirmish reference
+adapter. Battle interaction, turn controls, dice UI, replay, and event-log
+presentation are still intentionally deferred.
 
 Phase 1 is signed off through B12. B13 establishes the simulation engine's
-separate data boundary and B14 exposes a deployment-only Battle mode; rules
-resolution and battle interaction remain later batches.
+separate data boundary, B14 exposes a deployment-only Battle mode, and B15
+implements rules resolution as a pluggable, deterministic, non-UI layer.
 The Phase 1 acceptance record is in
 [`ux-audit/PHASE_1_SIGNOFF.md`](ux-audit/PHASE_1_SIGNOFF.md).
 
@@ -87,9 +88,20 @@ session snapshot or creates a new deterministic deployment session. Battle
 mode has its own roster and deployment drawers, unit cards, faction zones, and
 generic bounds/occupancy/blocking-terrain validation. Unit and objective
 markers remain visible in overhead and 3D. **Return to Build** leaves the
-planner unchanged and retains the session draft. Combat, movement resolution,
-rules adapters, roll UI, and turn interaction are intentionally not available
-yet.
+planner unchanged and retains the session draft. Battle interaction, roll UI,
+replay, and turn interaction are intentionally not available yet.
+
+## Rules-adapter foundation
+
+The engine provides a typed, documented rules-adapter interface for unit
+profiles, phases, legal actions, movement, range, terrain, cover, LOS,
+objective scoring, and seeded rolls. Every adapter result carries an
+inspectable explanation with inputs, assumptions, terrain, rolls, and outcome.
+The bundled `battle-builder-generic@1` adapter is an original small reference
+profile for deterministic testing; it is not a licensed or third-party
+ruleset. Read [`docs/RULES_ADAPTER.md`](docs/RULES_ADAPTER.md) before adding a
+new adapter. B16 will render adapter results; it must not recreate tactical
+calculations in the UI.
 
 ## Controls
 

@@ -262,3 +262,28 @@ B03 own the first visible workspace and board review.
   `pnpm build`, `pnpm audit`, `pnpm bundle:check`, `pnpm release:hygiene`, and
   `pnpm test:e2e` (41 isolated Chromium tests). Initial bundle size is
   305.5 KiB / 350 KiB; the lazy 3D chunk remains 516.4 KiB / 700 KiB.
+
+## B15 — rules-adapter framework and tactical resolution (2026-08-28)
+
+- Added a versioned, renderer-neutral `RulesAdapter` contract that owns unit
+  profiles, phases, legal actions, movement, range, terrain effects, cover,
+  line of sight, legal targets, objective scoring, and seeded roll resolution.
+  Every result carries a typed human-readable explanation listing inputs,
+  assumptions, terrain contributions, rolls, and its legal/illegal/resolved
+  outcome.
+- Added pure one-inch grid spatial helpers: deterministic four-way BFS
+  movement, square-grid range, terrain occupancy, supercover LOS/cover rays,
+  elevation hooks, and stable legal-target ingredients. They contain no
+  renderer, browser, clock, or ambient-random dependency.
+- Added `battle-builder-generic@1`, an original, explicitly non-third-party
+  skirmish reference adapter. Its documented scope supports deterministic
+  integration testing without implying compatibility with any licensed rules
+  system. B15 deliberately adds no action controls, turn UX, replay, event-log
+  UI, or battle result UI; those remain B16.
+- Focused unit coverage now has 47 passing tests, including blocked movement,
+  route detours, range, terrain cover, LOS blockers/elevation, legal targets,
+  objectives/contesting, invalid phase actions, and exact seeded-roll replay.
+  Full verification passed: `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm audit`, `pnpm bundle:check`, `pnpm release:hygiene`, and
+  the 41-test isolated Chromium regression suite. Initial bundle remains
+  305.5 KiB / 350 KiB and the lazy 3D chunk remains 516.4 KiB / 700 KiB.

@@ -265,7 +265,7 @@ UI and rules behavior remain gated behind their later batches.
 - [x] Add an isolated Battle deployment mode with factions, roster templates,
   unit cards, objectives, board snapshot safeguards, generic deployment zones,
   and non-destructive Build return. Tactical/rules calculations remain deferred.
-- [ ] Create game-system adapters for terrain effects, movement, range, cover, LOS, and future game-specific rules.
+- [x] Create a versioned, documented generic skirmish adapter boundary for terrain effects, movement, range, cover, LOS, objectives, and deterministic rolls; future game-specific adapters remain deferred.
 - [ ] Add calculation explanations and Battle-mode roll/replay presentation over the deterministic seeded engine.
 - [ ] Add event log, accessible result summaries, simulation tests, and replay snapshots.
 
