@@ -1,5 +1,6 @@
 .battle-action-list, .battle-replay-controls, .battle-log-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
 .battle-action-list .button, .battle-replay-controls .button, .battle-log-filters .button { margin-top: 0; }
+.battle-action-list .button--accent { color: #031115; border-color: #56ccda; background: #64dbe7; transition: none; }
 .battle-confirm-hint { margin-top: 8px !important; color: #819cab !important; font-size: 11px !important; }
 .battle-explanation { border-left: 2px solid #58cbd7; background: rgba(33, 93, 105, .12); }
 .battle-explanation--illegal { border-left-color: #dd8b6d; background: rgba(131, 61, 46, .14); }

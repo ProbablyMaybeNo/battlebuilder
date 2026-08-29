@@ -5,8 +5,8 @@ renderer-neutral board document, a precise overhead editor, and a real
 interactive 3D planning view. Phase 2 B13 adds an internal deterministic
 session contract, B14 adds a deployment-only Battle mode, and B15 adds a
 tested rules-adapter boundary plus an original generic skirmish reference
-adapter. Battle interaction, turn controls, dice UI, replay, and event-log
-presentation are still intentionally deferred.
+adapter. B16 adds the playable generic command surface, deterministic roll
+explanations, event audit log, and read-only replay controls.
 
 Phase 1 is signed off through B12. B13 establishes the simulation engine's
 separate data boundary, B14 exposes a deployment-only Battle mode, and B15
@@ -88,8 +88,11 @@ session snapshot or creates a new deterministic deployment session. Battle
 mode has its own roster and deployment drawers, unit cards, faction zones, and
 generic bounds/occupancy/blocking-terrain validation. Unit and objective
 markers remain visible in overhead and 3D. **Return to Build** leaves the
-planner unchanged and retains the session draft. Battle interaction, roll UI,
-replay, and turn interaction are intentionally not available yet.
+planner unchanged and retains the session draft. The Command drawer progresses
+the generic command/resolution cycle, previews movement or attacks, explains
+range/LOS/cover, requires explicit confirmation, and records seeded rolls.
+The Battle log filters events, copies the deterministic seed, and provides a
+clearly labelled read-only replay mode.
 
 ## Rules-adapter foundation
 
@@ -100,8 +103,8 @@ inspectable explanation with inputs, assumptions, terrain, rolls, and outcome.
 The bundled `battle-builder-generic@1` adapter is an original small reference
 profile for deterministic testing; it is not a licensed or third-party
 ruleset. Read [`docs/RULES_ADAPTER.md`](docs/RULES_ADAPTER.md) before adding a
-new adapter. B16 will render adapter results; it must not recreate tactical
-calculations in the UI.
+new adapter. The Battle UI renders adapter-produced explanations and does not
+recreate tactical calculations in browser state.
 
 ## Controls
 
@@ -125,7 +128,11 @@ return to the overhead editor; board data remains unchanged.
 The workspace uses landmarks, labelled controls, keyboard-operable drawers,
 menus, dialogs, tabs, terrain alternatives, focus restoration, live status
 messages, visible non-colour selection/lock/focus states, and reduced-motion
-support. Precise pointer operations have keyboard and inspector equivalents.
+support. Battle mode additionally has keyboard-operable roster/deployment,
+phase progression, action/target selection, confirmation, log filters, and
+replay controls; named calculation details communicate range, cover, invalid
+state, faction, and phase without relying only on colour. Precise pointer
+operations have keyboard and inspector equivalents.
 
 The planner targets current desktop Chrome, Edge, Firefox, and Safari with
 JavaScript, SVG, local storage, and WebGL enabled. Automated browser coverage

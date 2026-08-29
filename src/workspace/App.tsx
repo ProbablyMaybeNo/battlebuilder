@@ -48,6 +48,7 @@ export function App() {
   const [battleAction, setBattleAction] = useState<TacticalAction | null>(null);
   const [battleDestination, setBattleDestination] = useState<BattlePosition>({ x: 0, y: 0 });
   const [battleTargetId, setBattleTargetId] = useState<string | null>(null);
+  const [lastBattleExplanation, setLastBattleExplanation] = useState<RuleExplanation | null>(null);
   const [battleLogFilter, setBattleLogFilter] = useState<'all' | 'roll' | 'phase' | 'action'>('all');
   const [replayIndex, setReplayIndex] = useState<number | null>(null);
   const [mode, setMode] = useState<BoardMode>('neutral');
@@ -182,7 +183,7 @@ export function App() {
   };
   const addUnit = (template: UnitTemplate) => {
     if (!battleSession) return;
-    const faction = battleSession.factions[0]; if (!faction) return;
+    const faction = battleSession.factions[battleSession.units.length % battleSession.factions.length]; if (!faction) return;
     const unit: BattleUnit = { id: crypto.randomUUID(), factionId: faction.id, name: `${template.name} ${battleSession.units.filter((entry) => entry.factionId === faction.id).length + 1}`, position: null };
     resetRoster(battleSession.factions, [...battleSession.units, unit], `${unit.name} added to ${faction.name}.`);
   };
@@ -223,7 +224,7 @@ export function App() {
     if (battleAction === 'attack') {
       const unit = battleSession.units.find((entry) => entry.id === selectedUnitId)!;
       const roll = genericSkirmishAdapter.resolveRoll({ random: battleSession.random, minimum: 1, maximum: 6, target: genericSkirmishAdapter.profileFor(unit, battleSession).attackTarget, label: `${unit.name} attack` });
-      if (applyBattleCommand({ type: 'roll.request', id: crypto.randomUUID(), at, rollId: crypto.randomUUID(), minimum: 1, maximum: 6 }, `Attack confirmed: ${roll.explanation.summary}`)) setBattleAction(null);
+      if (applyBattleCommand({ type: 'roll.request', id: crypto.randomUUID(), at, rollId: crypto.randomUUID(), minimum: 1, maximum: 6 }, `Attack confirmed: ${roll.explanation.summary}`)) { setLastBattleExplanation(roll.explanation); setBattleAction(null); }
       return;
     }
     const objective = battleSession.objectives.find((entry) => entry.sourcePieceId !== null);
@@ -231,7 +232,7 @@ export function App() {
   };
   const advanceBattlePhase = () => {
     if (!battleSession) return;
-    const phases = genericSkirmishAdapter.phases(); const current = phases.indexOf(battleSession.turn.phase); const phase = phases[(current + 1) % phases.length]; let round = battleSession.turn.round; let active = battleSession.turn.activeFactionId;
+    const phase = battleSession.turn.phase === 'deployment' ? 'command' : battleSession.turn.phase === 'command' ? 'resolution' : battleSession.turn.phase === 'resolution' ? 'command' : 'deployment'; let round = battleSession.turn.round; let active = battleSession.turn.activeFactionId;
     if (phase === 'command' && battleSession.turn.phase === 'resolution') { const factionIndex = battleSession.factions.findIndex((faction) => faction.id === active); active = battleSession.factions[(factionIndex + 1) % battleSession.factions.length]?.id ?? null; if (active === battleSession.factions[0]?.id) round += 1; }
     applyBattleCommand({ type: 'phase.change', id: crypto.randomUUID(), at: new Date().toISOString(), phase, activeFactionId: active, round }, `Battle advanced to ${phase}.`);
   };
@@ -310,7 +311,7 @@ export function App() {
           </div>
         </section>
         {workspaceMode === 'build' && <><Drawer open={activeDrawer === 'board'} title="Board" onClose={() => setActiveDrawer(null)}><BoardPanel board={board} onHelp={() => setHelpOpen(true)} /></Drawer><Drawer open={activeDrawer === 'build'} title="Build" onClose={() => setActiveDrawer(null)}><BuildPanel activeKind={selectedCatalog} onChoose={chooseCatalog} onPlace={placeCatalogDefault} /></Drawer><Drawer open={activeDrawer === 'layers'} title="Layers" onClose={() => setActiveDrawer(null)}><LayersPanel board={board} selectedIds={selectedIds} onSelect={select} onChangePieces={patchMany} onReorder={reorder} /></Drawer><Drawer open={activeDrawer === 'setup'} title="Setup" onClose={() => setActiveDrawer(null)}><SetupPanel board={board} onSettings={updateSettings} /></Drawer><InspectorPanel piece={selectedPiece} selectionCount={selectedIds.length} accessType={accessType} onAccessType={(type) => { setAccessType(type); setMode('access'); }} onPatch={patchPiece} onDelete={removeSelected} onDuplicate={duplicate} onJoin={join} joinReason={joinReason} onRemoveAccess={removeFeature} onAddAccess={(type) => { if (!selectedPiece) return; setAccessType(type); addFeature(selectedPiece.id, 'north', Math.max(0, Math.floor(selectedPiece.width / 2) - 1)); }} /></>}
-        {workspaceMode === 'battle' && battleSession && <><Drawer open={activeDrawer === 'roster'} title="Battle roster" onClose={() => setActiveDrawer(null)}><RosterPanel session={battleSession} selectedUnitId={selectedUnitId} onSelectUnit={(id) => { setSelectedUnitId(id); setBattleAction(null); setActiveDrawer(null); }} onAddFaction={addFaction} onAddUnit={addUnit} /></Drawer><Drawer open={activeDrawer === 'deploy'} title="Deploy units" onClose={() => setActiveDrawer(null)}><DeploymentPanel session={battleSession} selectedUnitId={selectedUnitId} position={deploymentPosition} onPosition={setDeploymentPosition} onDeploy={deploySelected} /></Drawer><Drawer open={activeDrawer === 'command'} title="Battle command" onClose={() => setActiveDrawer(null)}><BattleCommandPanel session={battleSession} unitId={selectedUnitId} action={battleAction} destination={battleDestination} targetId={battleTargetId} explanation={preview} onAction={(action) => { setBattleAction(action); setBattleTargetId(null); }} onDestination={setBattleDestination} onTarget={setBattleTargetId} onConfirm={confirmBattleAction} onNextPhase={advanceBattlePhase} /></Drawer><Drawer open={activeDrawer === 'log'} title="Battle log" onClose={() => setActiveDrawer(null)}><BattleLogPanel session={battleSession} filter={battleLogFilter} onFilter={setBattleLogFilter} replayIndex={replayIndex} onReplayIndex={setReplayIndex} onCopySeed={copySeed} /></Drawer><BattleInspector session={battleSession} unitId={selectedUnitId} onDeploy={() => setActiveDrawer('deploy')} /></>}
+        {workspaceMode === 'battle' && battleSession && <><Drawer open={activeDrawer === 'roster'} title="Battle roster" onClose={() => setActiveDrawer(null)}><RosterPanel session={battleSession} selectedUnitId={selectedUnitId} onSelectUnit={(id) => { setSelectedUnitId(id); setBattleAction(null); setLastBattleExplanation(null); setActiveDrawer(null); }} onAddFaction={addFaction} onAddUnit={addUnit} /></Drawer><Drawer open={activeDrawer === 'deploy'} title="Deploy units" onClose={() => setActiveDrawer(null)}><DeploymentPanel session={battleSession} selectedUnitId={selectedUnitId} position={deploymentPosition} onPosition={setDeploymentPosition} onDeploy={deploySelected} /></Drawer><Drawer open={activeDrawer === 'command'} title="Battle command" onClose={() => setActiveDrawer(null)}><BattleCommandPanel session={battleSession} unitId={selectedUnitId} action={battleAction} destination={battleDestination} targetId={battleTargetId} explanation={lastBattleExplanation ?? preview} onAction={(action) => { setBattleAction(action); setBattleTargetId(null); setLastBattleExplanation(null); }} onDestination={setBattleDestination} onTarget={setBattleTargetId} onConfirm={confirmBattleAction} onNextPhase={advanceBattlePhase} /></Drawer><Drawer open={activeDrawer === 'log'} title="Battle log" onClose={() => setActiveDrawer(null)}><BattleLogPanel session={battleSession} filter={battleLogFilter} onFilter={setBattleLogFilter} replayIndex={replayIndex} onReplayIndex={setReplayIndex} onCopySeed={copySeed} /></Drawer><BattleInspector session={battleSession} unitId={selectedUnitId} onDeploy={() => setActiveDrawer('deploy')} /></>}
       </main>
     </div>
     <input ref={importInput} className="sr-only" type="file" accept="application/json,.json" aria-label="Import board JSON" onChange={importBoard} />

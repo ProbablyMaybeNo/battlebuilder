@@ -306,3 +306,23 @@ B03 own the first visible workspace and board review.
   `pnpm lint`, `pnpm typecheck`, `pnpm test` (47), `pnpm build`, `pnpm
   bundle:check`, `pnpm audit`, and `pnpm release:hygiene` passed. Initial
   route is 329.7 KiB / 350 KiB; lazy 3D remains 516.4 KiB / 700 KiB.
+
+## B17 — simulation accessibility, evidence, and release hygiene (2026-08-28)
+
+- Battle paths are keyboard-operable through mode transition, roster,
+  deployment, phase transition, action/target selection, confirmation, log
+  filtering, seed copy, replay, and Build return. The roster now alternates
+  added unit templates between available factions, enabling an inspectable
+  opposing-side scenario without hidden setup.
+- Added authoritative non-colour calculation copy for faction, phase, range,
+  LOS, cover, terrain, invalid state, and deterministic rolls. Focused axe
+  scans across roster, command preview, action, log, and read-only replay have
+  no serious or critical violations. A Battle-only accent transition caused a
+  real contrast finding; its static accessible foreground/background treatment
+  was corrected and verified.
+- Captured 14 canonical Battle evidence images under `screenshots/`: deployment,
+  active turn, target/LOS/cover, roll explanation, log/replay, invalid action,
+  and Battle-to-Build return at 1440×960 and 1920×1080.
+- Populated planner-plus-battle profiles passed at both sizes: 36×36/72 pieces
+  took 200 ms overhead and 456 ms 3D; 72×72/288 pieces took 260 ms overhead
+  and 452 ms 3D. Both remain far within the 5 s / 8 s browser guardrails.

@@ -2,9 +2,8 @@
 
 ## Active
 
-- None discovered during B16. B17 owns the full assistive-technology sweep,
-  visual evidence set, performance profiling, and release review for Battle
-  mode.
+- None. B17 verification completed the Battle-mode accessibility, visual
+  evidence, performance, and release review.
 
 ## Working agreement
 

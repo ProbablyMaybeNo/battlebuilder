@@ -38,7 +38,7 @@ simulation foundation; later batches remain gated by their direct dependencies.
 | B14 | Battle mode, factions, units, and deployment | B13 | Complete |
 | B15 | Rules-adapter framework and tactical resolution | B13, B14 | Complete |
 | B16 | Battle interaction, explanations, replay, and logs | B14, B15 | Complete |
-| B17 | Simulation accessibility, test evidence, and release hygiene | B13–B16 | Not started |
+| B17 | Simulation accessibility, test evidence, and release hygiene | B13–B16 | Complete |
 | B18 | Phase 2 sign-off and future-rules readiness gate | B17 | Not started |
 
 ---

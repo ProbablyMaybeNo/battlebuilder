@@ -43,9 +43,9 @@ actions, four-way movement, fixed-grid range, terrain effects, cover, LOS,
 board-anchored objective scoring, and seeded bounded rolls. Its terrain policy
 is explicit: buildings, ruins, walls, and water block movement; buildings,
 ruins, walls, and rocks block LOS; and buildings, ruins, walls, woods, rocks,
-and scatter provide cover. B16 will present these results, but it must use the
-adapter-produced `RuleExplanation` rather than calculate or paraphrase rules
-independently.
+and scatter provide cover. The Battle command surface presents these results
+directly from the adapter, including named range, LOS, cover, terrain, and
+seeded-roll details; it must not calculate or paraphrase rules independently.
 
 ## Adding an adapter
 
