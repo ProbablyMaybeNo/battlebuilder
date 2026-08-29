@@ -49,7 +49,7 @@ export function reduceBattleSession(current: BattleSession | null, input: Battle
   if (command.type === 'move.intent') {
     if (!current.units.some((unit) => unit.id === command.unitId)) return failure(current, 'Cannot record a move for an unknown unit.');
     const events = [event(current, { type: 'move.intent.recorded', commandId: command.id, at: command.at, unitId: command.unitId, destination: command.destination })];
-    return withEvents(current, command, events, { turn: { ...current.turn, moveIntent: { unitId: command.unitId, destination: command.destination } } });
+    return withEvents(current, command, events, { units: current.units.map((unit) => unit.id === command.unitId ? { ...unit, position: command.destination } : unit), turn: { ...current.turn, moveIntent: { unitId: command.unitId, destination: command.destination } } });
   }
   if (command.type === 'roll.request') {
     if (command.minimum > command.maximum) return failure(current, 'Roll minimum cannot exceed maximum.');

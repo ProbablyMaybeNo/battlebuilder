@@ -1,5 +1,11 @@
 # Battle Builder backlog
 
+## Active
+
+- None discovered during B16. B17 owns the full assistive-technology sweep,
+  visual evidence set, performance profiling, and release review for Battle
+  mode.
+
 ## Working agreement
 
 Every discovered defect, missing capability, performance issue, usability improvement, or visual issue is logged here, resolved in the active batch, and moved to the completed section with verification evidence. Phase 2 work is recorded separately only after Phase 1 sign-off.

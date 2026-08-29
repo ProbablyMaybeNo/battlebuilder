@@ -287,3 +287,22 @@ B03 own the first visible workspace and board review.
   `pnpm build`, `pnpm audit`, `pnpm bundle:check`, `pnpm release:hygiene`, and
   the 41-test isolated Chromium regression suite. Initial bundle remains
   305.5 KiB / 350 KiB and the lazy 3D chunk remains 516.4 KiB / 700 KiB.
+
+## B16 — battle interaction, explanations, replay, and logs (2026-08-28)
+
+- Added the Battle Command workspace: deliberate phase progression, selected
+  unit action selection, deterministic movement/attack/objective previews,
+  plain-language calculation explanations, and disabled confirmation for
+  illegal actions. Confirmed moves now update the shared battle position using
+  the existing deterministic command/history reducer; attack and objective
+  confirmations record seeded roll and objective events respectively.
+- Added filterable event/roll/phase/action audit history, calculation detail,
+  copyable deterministic seed, and step replay controls. Replay is explicitly
+  labelled read-only and live mutations report a recovery message until the
+  operator returns to live state. Battle selection and 3D/overhead switching
+  remain on the existing shared board surface.
+- Focused isolated Chromium coverage passed for a complete generic command,
+  replay entry/exit, invalid movement recovery, and reduced-motion operation.
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (47), `pnpm build`, `pnpm
+  bundle:check`, `pnpm audit`, and `pnpm release:hygiene` passed. Initial
+  route is 329.7 KiB / 350 KiB; lazy 3D remains 516.4 KiB / 700 KiB.

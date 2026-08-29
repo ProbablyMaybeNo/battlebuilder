@@ -1,0 +1,13 @@
+.battle-action-list, .battle-replay-controls, .battle-log-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.battle-action-list .button, .battle-replay-controls .button, .battle-log-filters .button { margin-top: 0; }
+.battle-confirm-hint { margin-top: 8px !important; color: #819cab !important; font-size: 11px !important; }
+.battle-explanation { border-left: 2px solid #58cbd7; background: rgba(33, 93, 105, .12); }
+.battle-explanation--illegal { border-left-color: #dd8b6d; background: rgba(131, 61, 46, .14); }
+.battle-explanation dl { display: grid; gap: 4px; margin: 10px 0 0; }
+.battle-explanation dl div { display: grid; grid-template-columns: 105px 1fr; gap: 8px; }
+.battle-explanation dt { color: #84aabb; }
+.battle-explanation dd { margin: 0; color: #d4e8ed; font-family: ui-monospace, monospace; font-size: 11px; }
+.battle-event-log { display: grid; gap: 6px; max-height: 330px; margin: 10px 0 0; padding: 0; overflow: auto; list-style: none; }
+.battle-event-log li { display: grid; gap: 2px; padding: 8px; border: 1px solid #284b61; border-radius: 6px; background: #0c1927; }
+.battle-event-log strong { color: #d9f1f5; font-size: 11px; }
+.battle-event-log small { color: #85a1af; font: 10px ui-monospace, monospace; }
