@@ -111,7 +111,9 @@ export function ThreeBoard({ board, preset, selectedIds = [], onSelect, onContex
       camera.lookAt(target);
       requestRender();
     };
-    const grid = new THREE.GridHelper(size, size, 0x59cbd6, 0x294b57);
+    // `size` divisions deliberately means one visible square per board inch.
+    // The 12-inch guides are added below as a brighter reference layer.
+    const grid = new THREE.GridHelper(size, size, 0x82eaf1, 0x4c8998);
     grid.position.set(width / 2, 0, height / 2);
     scene.add(grid);
     const major = new THREE.LineBasicMaterial({ color: 0x78edf5 });

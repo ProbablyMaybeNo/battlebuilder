@@ -7,6 +7,16 @@ in [VISUAL_REVIEW.md](VISUAL_REVIEW.md),
 [MANUAL_INTERACTION_CHECKLIST.md](MANUAL_INTERACTION_CHECKLIST.md), and
 [PHASE_1_SIGNOFF.md](PHASE_1_SIGNOFF.md).
 
+## Post-sign-off visual correction — one-inch grid readability (2026-08-28)
+
+- Confirmed the fixed grid contract as 37 vertical and 37 horizontal lines for
+  the standard 36 by 36 inch board: this creates 36 by 36 one-inch squares.
+  Lines at 12, 24, and 36 inches remain the heavier reference guides.
+- Corrected SVG minor-grid rendering from a sub-pixel fixed width to a
+  high-contrast one-pixel line, with crisp-edge rendering; aligned the 3D
+  minor-grid contrast. Focused unit, production build, and isolated browser
+  verification pass.
+
 ## B00 — project baseline verification (2026-08-26)
 
 - `pnpm lint` — passed with zero warnings.

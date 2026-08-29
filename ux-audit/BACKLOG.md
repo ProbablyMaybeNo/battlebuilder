@@ -1,10 +1,5 @@
 # Battle Builder backlog
 
-## Active
-
-- None. B17 verification completed the Battle-mode accessibility, visual
-  evidence, performance, and release review.
-
 ## Working agreement
 
 Every discovered defect, missing capability, performance issue, usability improvement, or visual issue is logged here, resolved in the active batch, and moved to the completed section with verification evidence. Phase 2 work is recorded separately only after Phase 1 sign-off.
@@ -14,6 +9,14 @@ Every discovered defect, missing capability, performance issue, usability improv
 _No active defects recorded._
 
 ## Completed
+
+- **POST-001 — The one-inch board grid was technically present but rendered
+  below a readable screen-pixel width, so a 36-inch board could look like only
+  12-inch zones.** Increased the fixed-pixel contrast and width of every
+  one-inch SVG line while retaining brighter 12-inch references, aligned the
+  Three.js minor-grid colour, and added an explicit 37-lines/36-squares unit
+  assertion. Verified with focused unit, production build, and isolated visual
+  browser checks.
 
 - **B15-001 — Battle sessions had no pluggable, inspectable tactical-rules
   boundary, so movement, range, terrain, cover, LOS, objectives, and rolls
