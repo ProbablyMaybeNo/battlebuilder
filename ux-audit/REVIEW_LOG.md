@@ -326,3 +326,14 @@ B03 own the first visible workspace and board review.
 - Populated planner-plus-battle profiles passed at both sizes: 36×36/72 pieces
   took 200 ms overhead and 456 ms 3D; 72×72/288 pieces took 260 ms overhead
   and 452 ms 3D. Both remain far within the 5 s / 8 s browser guardrails.
+
+## B18 — Phase 2 readiness sign-off (2026-08-28)
+
+- Reconciled B13–B17 contracts, deterministic replay tests, isolated browser
+  evidence, accessibility scans, visual captures, performance profiles,
+  bundle/audit/hygiene checks, documentation, and backlog. All acceptance
+  items pass with no active defect.
+- `PHASE_2_SIGNOFF.md` records the evidence-based pass decision and the
+  rules-adapter extension boundary. This signs off only the original generic
+  simulation platform; it does not authorize an unversioned or third-party
+  rules implementation.
