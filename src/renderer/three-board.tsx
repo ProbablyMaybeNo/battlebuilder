@@ -9,10 +9,10 @@ export type ThreePreset = 'top' | 'isometric' | 'perspective' | 'front';
 type Runtime = { applyPreset: (preset: ThreePreset) => void; applySelection: (ids: readonly string[]) => void };
 type MeshPart = ReturnType<typeof terrainGeometry>['mesh'][number];
 
-const materialPalette: Record<string, { color: number; roughness?: number; metalness?: number; transparent?: boolean; opacity?: number }> = {
-  'building-wall': { color: 0x355661, roughness: .7, metalness: .08 }, roof: { color: 0x2a4853, roughness: .8 }, interior: { color: 0x37484c, roughness: .95 },
+const materialPalette: Record<string, { color: number; roughness?: number; metalness?: number; transparent?: boolean; opacity?: number; emissive?: number; emissiveIntensity?: number }> = {
+  'building-wall': { color: 0x1aaec2, emissive: 0x07515f, emissiveIntensity: .55, roughness: .58, metalness: .12 }, roof: { color: 0x168da1, emissive: 0x063b49, emissiveIntensity: .42, roughness: .65 }, interior: { color: 0x19616b, emissive: 0x08343b, emissiveIntensity: .34, roughness: .8 },
   'ruin-wall': { color: 0x806752, roughness: .95 }, platform: { color: 0x547278, roughness: .78 }, road: { color: 0x3c4b52, roughness: 1 },
-  water: { color: 0x297990, roughness: .32, metalness: .15, transparent: true, opacity: .84 }, wall: { color: 0x667074, roughness: .9 }, woods: { color: 0x3f6e54, roughness: .95 },
+  water: { color: 0x297990, roughness: .32, metalness: .15, transparent: true, opacity: .84 }, wall: { color: 0x667074, roughness: .9 }, woods: { color: 0x32c879, emissive: 0x0a4c2b, emissiveIntensity: .48, roughness: .82, transparent: true, opacity: .9 },
   rocks: { color: 0x72797b, roughness: 1 }, scatter: { color: 0x977450, roughness: .9 }, objective: { color: 0xd8a54c, roughness: .48, metalness: .2 },
   token: { color: 0xa677d0, roughness: .48, metalness: .2 }, marker: { color: 0xd47986, roughness: .48, metalness: .14 },
 };
@@ -84,6 +84,7 @@ export function ThreeBoard({ board, preset, selectedIds = [], onSelect, onContex
       const existing = materials.get(materialKey);
       if (existing) return existing;
       const material = new THREE.MeshStandardMaterial(materialPalette[name] ?? { color: 0x70939a, roughness: .8 });
+      const palette = materialPalette[name]; if (palette?.emissive) { material.emissive.setHex(palette.emissive); material.emissiveIntensity = palette.emissiveIntensity ?? 0; }
       if (selected) { material.emissive.setHex(0x4ebac5); material.emissiveIntensity = .26; }
       if (locked) { material.transparent = true; material.opacity = .72; }
       materials.set(materialKey, material);

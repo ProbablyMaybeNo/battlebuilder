@@ -7,8 +7,8 @@ export function TerrainDefs() {
   return <defs>
     <pattern id="terrain-road" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#273746" /><path d="M0 1h2" stroke="#55717a" strokeWidth=".08" strokeDasharray=".42 .26" /></pattern>
     <pattern id="terrain-water" width="1.8" height="1" patternUnits="userSpaceOnUse"><rect width="1.8" height="1" fill="#123c58" /><path d="M.15 .52c.25-.3.52-.3.77 0s.5.3.76 0" fill="none" stroke="#79c9df" strokeWidth=".08" /></pattern>
-    <pattern id="terrain-interior" width=".7" height=".7" patternUnits="userSpaceOnUse"><rect width=".7" height=".7" fill="#25313a" /><path d="M0 .7.7 0" stroke="#557079" strokeWidth=".06" /></pattern>
-    <pattern id="terrain-woods" width="1.4" height="1.4" patternUnits="userSpaceOnUse"><rect width="1.4" height="1.4" fill="#193c35" /><circle cx=".36" cy=".4" r=".28" fill="#447d66" /><circle cx="1.05" cy=".78" r=".34" fill="#315f51" /></pattern>
+    <pattern id="terrain-interior" width=".7" height=".7" patternUnits="userSpaceOnUse"><rect width=".7" height=".7" fill="#123740" /><path d="M0 .7.7 0" stroke="#54cbd8" strokeWidth=".06" /></pattern>
+    <pattern id="terrain-woods" width="1.4" height="1.4" patternUnits="userSpaceOnUse"><rect width="1.4" height="1.4" fill="#0e4a32" fillOpacity=".72" /><circle cx=".36" cy=".4" r=".28" fill="#4cf39b" /><circle cx="1.05" cy=".78" r=".34" fill="#1dbd70" /></pattern>
     <pattern id="terrain-scatter" width="1.1" height="1.1" patternUnits="userSpaceOnUse"><rect width="1.1" height="1.1" fill="#40352b" /><path d="M.2.2h.42v.38H.2zM.68.62h.25v.23H.68z" fill="#b48a57" /></pattern>
   </defs>;
 }

@@ -25,7 +25,7 @@ test('opens drawers and restores focus with Escape', async ({ page }) => {
   await expect(boardLauncher).toBeFocused();
   await page.getByRole('button', { name: 'Build / add terrain' }).click();
   await expect(page.getByRole('complementary', { name: 'Build' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Search terrain catalog' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Search structures and terrain' })).toBeVisible();
 });
 
 test('keeps one keyboard-operable Board menu and modal help dialog', async ({ page }) => {

@@ -43,11 +43,12 @@ for (const viewport of viewports) {
     await screenshot(page, testInfo, `selected-inspector--overhead--${viewport.width}x${viewport.height}.png`);
 
     await page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' }).click();
-    await page.getByRole('complementary', { name: 'Build' }).getByRole('button', { name: /Field building/ }).first().click();
+    await page.getByRole('complementary', { name: 'Build' }).getByRole('button', { name: 'Building' }).click();
     const board = page.getByRole('application', { name: '36 by 36 inch overhead board' });
     const bounds = await board.boundingBox();
     if (!bounds) throw new Error('Overhead board is unavailable for invalid-placement evidence.');
-    const point = (x: number, y: number) => ({ clientX: bounds.x + bounds.width * (x / 36), clientY: bounds.y + bounds.height * (y / 36) });
+    const size = Math.min(bounds.width, bounds.height); const left = bounds.x + (bounds.width - size) / 2; const top = bounds.y + (bounds.height - size) / 2;
+    const point = (x: number, y: number) => ({ clientX: left + size * (x / 36), clientY: top + size * (y / 36) });
     await board.dispatchEvent('pointerdown', { pointerId: 81, pointerType: 'mouse', button: 0, ...point(3, 4) });
     await board.dispatchEvent('pointermove', { pointerId: 81, pointerType: 'mouse', ...point(9, 8) });
     await expect(board.locator('.construction-preview--invalid')).toBeVisible();

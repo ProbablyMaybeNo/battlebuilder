@@ -6,9 +6,25 @@ Every discovered defect, missing capability, performance issue, usability improv
 
 ## Active
 
-_No active defects recorded._
+_No active defects recorded. B20 is intentionally deferred: the user asked us
+to keep interior rooms and semantic structure properties in mind, not build
+them in this immediate usability pass._
 
 ## Completed
+
+- **B19-001 — Precision input and core tool flow regressions.** Corrected
+  letterboxed SVG pointer-to-cell mapping; made Select the default and removed
+  Neutral; clicking empty board now clears selection and closes the inspector;
+  reduced Build to one searchable Structures & terrain library; replaced
+  confusing catalog names such as “Service road”; and established neon-cyan
+  structures with translucent neon-green woods in overhead and 3D. Verified
+  with focused and full isolated Chromium coverage, live browser interaction
+  review, strict checks, production build, audit, bundle budget, and hygiene.
+
+- **B20-001 (deferred by product direction) — Structures lack interior rooms,
+  internal walls/doors/windows, stories, cover semantics, and interactive
+  markers.** This requires a versioned document/model and renderer extension;
+  it is deliberately planned next rather than rushed into B19.
 
 - **POST-001 — The one-inch board grid was technically present but rendered
   below a readable screen-pixel width, so a 36-inch board could look like only

@@ -1,14 +1,14 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from './fixtures';
 
-test('searches the grouped build library and arms placement immediately', async ({ page }) => {
+test('searches the unified build library and arms placement immediately', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Build / add terrain' }).click();
   const drawer = page.getByRole('complementary', { name: 'Build' });
-  await expect(drawer.getByText('Favorites')).toBeVisible();
-  await drawer.getByRole('textbox', { name: 'Search terrain catalog' }).fill('water');
-  await expect(drawer.getByRole('button', { name: /Shallow water/ })).toHaveCount(1);
-  await drawer.getByRole('button', { name: /Shallow water/ }).first().click();
+  await expect(drawer.getByText('Structures & terrain')).toBeVisible();
+  await drawer.getByRole('textbox', { name: 'Search structures and terrain' }).fill('water');
+  await expect(drawer.getByRole('button', { name: 'Water' })).toHaveCount(1);
+  await drawer.getByRole('button', { name: 'Water' }).click();
   await expect(drawer).toHaveCount(0);
   await expect(page.getByLabel('Canvas controls').getByRole('button', { name: 'Build' })).toHaveAttribute('aria-pressed', 'true');
 });

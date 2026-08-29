@@ -40,6 +40,8 @@ simulation foundation; later batches remain gated by their direct dependencies.
 | B16 | Battle interaction, explanations, replay, and logs | B14, B15 | Complete |
 | B17 | Simulation accessibility, test evidence, and release hygiene | B13–B16 | Complete |
 | B18 | Phase 2 sign-off and future-rules readiness gate | B17 | Complete |
+| B19 | Board planner precision and clarity pass | B18 | Complete |
+| B20 | Structure interiors and semantic terrain | B19 | Planned |
 
 ---
 

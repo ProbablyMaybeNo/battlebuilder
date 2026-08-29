@@ -17,6 +17,21 @@ in [VISUAL_REVIEW.md](VISUAL_REVIEW.md),
   minor-grid contrast. Focused unit, production build, and isolated browser
   verification pass.
 
+## B19 — board planner precision and clarity pass (2026-08-28)
+
+- Corrected an actual pointer-placement defect caused by square SVG content
+  being centred within its rectangular host. Browser drag verification now
+  confirms the visible cell and built footprint agree exactly.
+- Removed Neutral in favour of Select as the default. Live browser review
+  confirmed a selected building opens the inspector and a click on empty board
+  closes it. The Build drawer is now a single searchable library without
+  duplicate Favorites/Recent/group content; plain-language catalog labels
+  include Road rather than Service road.
+- Reviewed both renderers in the live application: buildings are neon cyan and
+  woods are a slightly translucent neon green. `pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, isolated Chromium coverage, production build, bundle budget,
+  audit, and release hygiene pass.
+
 ## B00 — project baseline verification (2026-08-26)
 
 - `pnpm lint` — passed with zero warnings.
